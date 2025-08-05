@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrSaab - AI doctor that travels with you everywhere, anywhere!</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3f5df1, #133f5a);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .user-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .user-type-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .user-type-btn.active {
+            background: rgba(255,255,255,0.9);
+            color: #3f5df1;
+            border-color: rgba(255,255,255,0.9);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.offline {
+            background: #045e12;
+        }
+
+        .status-dot.error {
+            background: #22799f;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .emergency-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff4757, #c44569);
+            color: white;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            animation: emergencyPulse 2s infinite;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emergency-button:hover {
+            transform: scale(1.1);
+        }
+
+        .emergency-text {
+            font-size: 0.5em;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(255, 71, 87, 0.8); }
+        }
+
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px 30px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message.emergency {
+            border-left: 4px solid #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user .message-avatar {
+            background: #007bff;
+        }
+
+        .ai .message-avatar {
+            background: #28a745;
+        }
+
+        .host .message-avatar {
+            background: #fd7e14;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .user .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .host .message-content {
+            background: #fd7e14;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .doctor-contacts {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .doctor-contacts h4 {
+            color: #28a745;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #c3e6cb;
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: #155724;
+        }
+
+        .contact-phone {
+            color: #28a745;
+            font-size: 0.9em;
+            margin-top: 2px;
+        }
+
+        .contact-distance {
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
+        .call-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+        }
+
+        .call-btn:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .panic-protocol {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .panic-protocol h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .protocol-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        .step-number {
+            background: #ffc107;
+            color: #856404;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 15px 20px;
+            font-size: 16px;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #007bff;
+        }
+
+        .input-field.emergency-mode {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .send-button {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+
+        .send-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .send-button.emergency-mode {
+            background: linear-gradient(135deg, #ff4757, #c44569);
+            animation: emergencyButtonPulse 1s infinite;
+        }
+
+        @keyframes emergencyButtonPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .quick-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-option {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+        }
+
+        .quick-option:hover {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .quick-option.emergency {
+            background: #ff4757;
+            color: white;
+            border-color: #ff4757;
+            animation: emergencyOptionPulse 1.5s infinite;
+        }
+
+        @keyframes emergencyOptionPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #6c757d;
+            animation: loadingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loadingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .emergency-banner {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 15px 30px;
+            text-align: center;
+            font-weight: 600;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .emergency-banner i {
+            margin-right: 8px;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0%, 50% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .symptom-card:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+
+        .symptom-card.emergency {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .symptom-card.emergency:hover {
+            background: rgba(255, 71, 87, 0.1);
+            border-color: #ff4757;
+        }
+
+        .symptom-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .emergency-mode-indicator {
+            background: linear-gradient(135deg, #ff4757, #c44569);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: 600;
+            animation: emergencyModeFlash 1s infinite;
+        }
+
+        @keyframes emergencyModeFlash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 1.5em;
+            }
+            
+            .chat-container {
+                height: 350px;
+                padding: 15px 20px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .input-container {
+                padding: 15px 20px;
+            }
+
+            .emergency-button {
+                top: 10px;
+                right: 10px;
+                width: 60px;
+                height: 60px;
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Emergency Button -->
+    <button class="emergency-button" onclick="activateEmergencyMode()">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="emergency-text">SOS</div>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">🧑🏻‍⚕️</div>
+                <div class="title">DrSaab</div>
+                <div class="subtitle">AI doctor that travels with you everywhere, anywhere!</div>
+                
+                <div class="user-selector">
+                    <div class="user-type-btn active" onclick="setUserType('tourist')" id="touristBtn">
+                        <i class="fas fa-suitcase"></i> Tourist
+                    </div>
+                    <div class="user-type-btn" onclick="setUserType('host')" id="hostBtn">
+                        <i class="fas fa-home"></i> Host
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="emergencyModeIndicator" class="emergency-mode-indicator" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i> EMERGENCY MODE ACTIVATED - Priority Medical Support
+        </div>
+
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Connecting to AI...</span>
+            </div>
+            <div>
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="locationText">Rural India</span>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <h3>🙏 Namaste! Welcome to DrSaab Medical AI</h3>
+                <p id="welcomeText">I'm here to help tourists and hosts with medical concerns during rural homestays. Describe symptoms or choose from common issues below:</p>
+                
+                <div class="symptoms-grid" style="margin-top: 30px;">
+                    <div class="symptom-card emergency" onclick="activateEmergencyMode('panic')">
+                        <div class="symptom-icon">😰</div>
+                        <div>Panic Attack</div>
+                    </div>
+                    <div class="symptom-card emergency" onclick="activateEmergencyMode('chest')">
+                        <div class="symptom-icon">💔</div>
+                        <div>Chest Pain</div>
+                    </div>
+                    <div class="symptom-card" onclick="quickSymptom('I feel dizzy after the bus ride')">
+                        <div class="symptom-icon">🌀</div>
+                        <div>Motion Sickness</div>
+                    </div>
+                    <div class="symptom-card" onclick="quickSymptom('I have jetlag and feeling tired')">
+                        <div class="symptom-icon">✈️</div>
+                        <div>Jetlag</div>
+                    </div>
+                    <div class="symptom-card" onclick="quickSymptom('I feel dehydrated and thirsty')">
+                        <div class="symptom-icon">💧</div>
+                        <div>Dehydration</div>
+                    </div>
+                    <div class="symptom-card" onclick="quickSymptom('I have stomach pain and nausea')">
+                        <div class="symptom-icon">🤢</div>
+                        <div>Stomach Issues</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="quick-options" id="quickOptions">
+                <div class="quick-option emergency" onclick="activateEmergencyMode('breathing')" style="display: none;">
+                    🫁 Breathing Issues
+                </div>
+                <div class="quick-option emergency" onclick="activateEmergencyMode('severe')" style="display: none;">
+                    🚨 Severe Emergency
+                </div>
+                <div class="quick-option" onclick="quickSymptom('What should I do for headache?')">Headache help</div>
+                <div class="quick-option" onclick="quickSymptom('Food poisoning symptoms')">Food poisoning</div>
+                <div class="quick-option" onclick="quickSymptom('Heat exhaustion in hot weather')">Heat exhaustion</div>
+                <div class="quick-option" onclick="quickSymptom('Insect bite treatment')">Insect bites</div>
+            </div>
+            
+            <div class="input-wrapper">
+                <textarea 
+                    id="messageInput" 
+                    class="input-field" 
+                    placeholder="Describe symptoms or health concern..."
+                    rows="1"
+                ></textarea>
+                <button id="sendButton" class="send-button" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="emergency-banner">
+            <i class="fas fa-exclamation-triangle"></i>
+            For serious emergencies, please call 108 (Indian Emergency Services) or visit the nearest hospital immediately
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const OLLAMA_URL = 'http://localhost:11434/api/generate';
+        const MODEL_NAME = 'llama3';
+        
+        // State
+        let isConnected = false;
+        let isProcessing = false;
+        let currentUserType = 'tourist';
+        let emergencyMode = false;
+        let nearbyDoctors = [
+            { name: "Dr. Rajesh Kumar", phone: "+91-9876543210", distance: "2.5 km", specialty: "General Medicine" },
+            { name: "Dr. Priya Sharma", phone: "+91-9876543211", distance: "3.8 km", specialty: "Emergency Medicine" },
+            { name: "Primary Health Centre", phone: "+91-9876543212", distance: "1.2 km", specialty: "General Care" }
+        ];
+        
+        // System prompts for different scenarios
+        const SYSTEM_PROMPTS = {
+            tourist: `You are DrSaab, a medical AI assistant for tourists in rural India homestays. Provide warm, culturally sensitive advice for travel health issues. Keep responses concise (2-4 sentences). Always suggest PHC visits for serious symptoms and end with "If symptoms persist, visit the nearest Primary Health Centre or call 108."`,
+            
+            host: `You are DrSaab, helping homestay hosts care for tourists with medical issues. Provide clear guidance on: 1) How to help the tourist, 2) When to contact local doctors, 3) Basic first aid steps. Be supportive and practical. Always prioritize safety and professional medical help when needed.`,
+            
+            emergency: `You are DrSaab in EMERGENCY MODE. The situation requires immediate attention. Provide: 1) Immediate first aid steps, 2) When to call 108 emergency services, 3) How to keep the person stable until help arrives. Be direct, clear, and prioritize safety. Always recommend calling 108 for serious emergencies.`
+        };
+
+        // DOM elements
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const emergencyModeIndicator = document.getElementById('emergencyModeIndicator');
+        const touristBtn = document.getElementById('touristBtn');
+        const hostBtn = document.getElementById('hostBtn');
+        const welcomeText = document.getElementById('welcomeText');
+        const locationText = document.getElementById('locationText');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkOllamaConnection();
+            setupInputHandlers();
+            updateWelcomeMessage();
+        });
+
+        // Set user type
+        function setUserType(type) {
+            currentUserType = type;
+            touristBtn.classList.toggle('active', type === 'tourist');
+            hostBtn.classList.toggle('active', type === 'host');
+            updateWelcomeMessage();
+            
+            if (type === 'host') {
+                locationText.textContent = 'Homestay Host';
+            } else {
+                locationText.textContent = 'Rural India';
+            }
+        }
+
+        // Update welcome message based on user type
+        function updateWelcomeMessage() {
+            if (currentUserType === 'host') {
+                welcomeText.textContent = "I'm here to help you care for tourists staying at your homestay. I can guide you through medical situations and when to contact local doctors.";
+            } else {
+                welcomeText.textContent = "I'm here to help tourists and hosts with medical concerns during rural homestays. Describe symptoms or choose from common issues below:";
+            }
+        }
+
+        // Activate emergency mode
+        function activateEmergencyMode(type = 'general') {
+            emergencyMode = true;
+            emergencyModeIndicator.style.display = 'block';
+            messageInput.classList.add('emergency-mode');
+            sendButton.classList.add('emergency-mode');
+            
+            // Show emergency quick options
+            const emergencyOptions = document.querySelectorAll('.quick-option.emergency');
+            emergencyOptions.forEach(option => option.style.display = 'inline-block');
+            
+            // Clear welcome message
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) welcomeMsg.remove();
+            
+            let emergencyMessage = '';
+            switch(type) {
+                case 'panic':
+                    emergencyMessage = 'Emergency: Tourist having panic attack at homestay';
+                    break;
+                case 'chest':
+                    emergencyMessage = 'Emergency: Tourist experiencing chest pain';
+                    break;
+                case 'breathing':
+                    emergencyMessage = 'Emergency: Tourist having breathing difficulties';
+                    break;
+                case 'severe':
+                    emergencyMessage = 'Emergency: Serious medical situation requiring immediate help';
+                    break;
+                default:
+                    emergencyMessage = 'Emergency medical situation';
+            }
+            
+            messageInput.value = emergencyMessage;
+            sendMessage();
+        }
+
+        // Check Ollama connection
+        async function checkOllamaConnection() {
+            try {
+                const response = await fetch('http://localhost:11434/api/tags');
+                if (response.ok) {
+                    setConnectionStatus(true, 'AI Ready');
+                } else {
+                    setConnectionStatus(false, 'AI Unavailable - Using Offline Mode');
+                }
+            } catch (error) {
+                setConnectionStatus(false, 'AI Unavailable - Using Offline Mode');
+            }
+        }
+
+        // Set connection status
+        function setConnectionStatus(connected, message) {
+            isConnected = connected;
+            statusText.textContent = message;
+            statusDot.className = connected ? 'status-dot' : 'status-dot offline';
+        }
+
+        // Setup input handlers
+        function setupInputHandlers() {
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+
+        // Quick symptom selection
+        function quickSymptom(symptom) {
+            messageInput.value = symptom;
+            sendMessage();
+        }
+
+        // Send message
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isProcessing) return;
+
+            // Clear welcome message
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) welcomeMsg.remove();
+
+            // Add user message
+            addMessage(message, currentUserType);
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Show loading
+            const loadingId = addLoadingMessage();
+            isProcessing = true;
+            sendButton.disabled = true;
+
+            try {
+                let response;
+                if (isConnected) {
+                    response = await getAIResponse(message);
+                } else {
+                    response = getOfflineResponse(message);
+                }
+                
+                removeLoadingMessage(loadingId);
+                addMessage(response, 'ai');
+                
+                // If emergency mode, also show doctor contacts and panic protocol
+                if (emergencyMode) {
+                    showEmergencyProtocol(message);
+                    showDoctorContacts();
+                }
+                
+            } catch (error) {
+                removeLoadingMessage(loadingId);
+                addMessage("I'm having trouble connecting. For emergencies, immediately call 108 or visit the nearest hospital. Stay calm and keep the person comfortable.", 'ai');
+            } finally {
+                isProcessing = false;
+                sendButton.disabled = false;
+            }
+        }
+
+        // Get AI response from Ollama
+        async function getAIResponse(userMessage) {
+            const promptType = emergencyMode ? 'emergency' : currentUserType;
+            const systemPrompt = SYSTEM_PROMPTS[promptType];
+            
+            const payload = {
+                model: MODEL_NAME,
+                prompt: `${systemPrompt}\n\nUser (${currentUserType}): ${userMessage}\n\nDrSaab:`,
+                stream: false,
+                options: {
+                    temperature: 0.7,
+                    top_p: 0.9,
+                    max_tokens: 300
+                }
+            };
+
+            const response = await fetch(OLLAMA_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.response || "I apologize, but I couldn't process your request right now. Please try again or seek medical attention if needed.";
+        }
+
+        // Show emergency protocol for panic attacks
+        function showEmergencyProtocol(message) {
+            const msg = message.toLowerCase();
+            let protocolHTML = '';
+            
+            if (msg.includes('panic') || msg.includes('anxiety') || msg.includes('attack')) {
+                protocolHTML = `
+                    <div class="panic-protocol">
+                        <h4><i class="fas fa-heart"></i> Panic Attack Protocol for Host</h4>
+                        <div class="protocol-step">
+                            <div class="step-number">1</div>
+                            <div>Stay calm and speak in a soothing voice. Your calmness will help them.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">2</div>
+                            <div>Help them sit down in a quiet, comfortable place away from crowds.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">3</div>
+                            <div>Guide them through slow, deep breathing: "Breathe in for 4 counts, hold for 4, breathe out for 6."</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">4</div>
+                            <div>Reassure them: "You are safe. This will pass. I'm here to help you."</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">5</div>
+                            <div>If symptoms don't improve in 10-15 minutes, contact a doctor immediately.</div>
+                        </div>
+                    </div>
+                `;
+            } else if (msg.includes('chest') || msg.includes('heart') || msg.includes('pain')) {
+                protocolHTML = `
+                    <div class="panic-protocol">
+                        <h4><i class="fas fa-heartbeat"></i> Chest Pain Emergency Protocol</h4>
+                        <div class="protocol-step">
+                            <div class="step-number">1</div>
+                            <div><strong>Call 108 immediately</strong> - Chest pain can be serious.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">2</div>
+                            <div>Help them sit upright in a comfortable position.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">3</div>
+                            <div>Loosen tight clothing around chest and neck.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">4</div>
+                            <div>Stay with them, monitor breathing, and keep them calm until help arrives.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">5</div>
+                            <div>If they become unconscious, be prepared to perform CPR if trained.</div>
+                        </div>
+                    </div>
+                `;
+            } else if (msg.includes('breathing') || msg.includes('breath')) {
+                protocolHTML = `
+                    <div class="panic-protocol">
+                        <h4><i class="fas fa-lungs"></i> Breathing Emergency Protocol</h4>
+                        <div class="protocol-step">
+                            <div class="step-number">1</div>
+                            <div>Help them sit upright and lean slightly forward.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">2</div>
+                            <div>Ensure fresh air circulation - open windows/doors.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">3</div>
+                            <div>Loosen tight clothing, especially around neck and chest.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">4</div>
+                            <div>If severe difficulty breathing, <strong>call 108 immediately</strong>.</div>
+                        </div>
+                        <div class="protocol-step">
+                            <div class="step-number">5</div>
+                            <div>Monitor their condition closely and be ready to assist emergency services.</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (protocolHTML) {
+                const protocolDiv = document.createElement('div');
+                protocolDiv.innerHTML = protocolHTML;
+                chatContainer.appendChild(protocolDiv.firstElementChild);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        // Show nearby doctor contacts
+        function showDoctorContacts() {
+            const contactsHTML = `
+                <div class="doctor-contacts">
+                    <h4><i class="fas fa-phone-alt"></i> Nearby Medical Contacts</h4>
+                    ${nearbyDoctors.map(doctor => `
+                        <div class="contact-item">
+                            <div class="contact-info">
+                                <div class="contact-name">${doctor.name}</div>
+                                <div class="contact-phone">${doctor.phone}</div>
+                                <div class="contact-distance">${doctor.distance} - ${doctor.specialty}</div>
+                            </div>
+                            <button class="call-btn" onclick="makeCall('${doctor.phone}', '${doctor.name}')">
+                                <i class="fas fa-phone"></i> Call
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            const contactsDiv = document.createElement('div');
+            contactsDiv.innerHTML = contactsHTML;
+            chatContainer.appendChild(contactsDiv.firstElementChild);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Make phone call (simulate)
+        function makeCall(phone, name) {
+            // In a real app, this would trigger the device's phone app
+            alert(`Calling ${name} at ${phone}\n\nIn a real application, this would open your phone's dialer.`);
+            
+            // Add call log to chat
+            addMessage(`📞 Calling ${name} (${phone}) for emergency medical assistance`, 'system');
+        }
+
+        // Offline responses for different user types and emergency situations
+        function getOfflineResponse(message) {
+            const msg = message.toLowerCase();
+            
+            // Emergency responses
+            if (emergencyMode || msg.includes('emergency') || msg.includes('panic') || msg.includes('chest pain')) {
+                if (msg.includes('panic') || msg.includes('anxiety')) {
+                    if (currentUserType === 'host') {
+                        return "HOST GUIDANCE: This tourist is having a panic attack. Stay calm and help them sit down. Guide them to breathe slowly - in for 4 counts, hold for 4, out for 6. Speak gently: 'You're safe, this will pass.' If it doesn't improve in 15 minutes or gets worse, call the nearest doctor immediately. Keep them away from crowds and noise.";
+                    } else {
+                        return "You're having a panic attack - this is scary but not dangerous. Sit down somewhere quiet. Focus on slow, deep breathing: breathe in for 4, hold for 4, breathe out for 6. Tell yourself 'This will pass, I am safe.' If your host is nearby, ask them to stay with you. If symptoms persist beyond 20 minutes, seek medical help.";
+                    }
+                }
+                
+                if (msg.includes('chest') || msg.includes('heart')) {
+                    return "⚠️ CHEST PAIN IS SERIOUS - Call 108 immediately! While waiting: sit upright, loosen tight clothing, stay calm. If you're a host, stay with the tourist, monitor their breathing, and be ready to help emergency services find your location. Don't give any medication unless prescribed by a doctor.";
+                }
+                
+                if (msg.includes('breathing') || msg.includes('breath')) {
+                    return "Breathing difficulty needs immediate attention! Sit upright, get fresh air, loosen tight clothing. If severe, call 108 now. Host should help the tourist sit comfortably and ensure good ventilation. Don't leave them alone if breathing is very difficult.";
+                }
+            }
+            
+            // Host-specific responses
+            if (currentUserType === 'host') {
+                if (msg.includes('dizzy') || msg.includes('motion')) {
+                    return "Your guest has motion sickness from travel. Help them to a quiet, well-ventilated room. Offer small sips of water and suggest they rest with eyes closed. Ginger tea (adrak chai) if available. They should feel better in a few hours. If vomiting is severe or continues, contact a local doctor.";
+                }
+                
+                if (msg.includes('stomach') || msg.includes('food') || msg.includes('nausea')) {
+                    return "Tourist likely has an upset stomach from new foods. Give them clean water to sip slowly, and simple foods like rice or banana if they can eat. Avoid dairy and spicy foods. Keep them comfortable and watch for fever. If vomiting continues or they develop high fever, contact the nearest Primary Health Centre.";
+                }
+                
+                if (msg.includes('fever') || msg.includes('hot')) {
+                    return "Help the tourist cool down - move them to shade/AC, give cool water to drink, use cool wet cloths on forehead. Remove excess clothing. Monitor their temperature. If fever is high (over 102°F) or they seem confused, contact a doctor immediately. This could be heat exhaustion or something more serious.";
+                }
+            }
+            
+            // Standard tourist responses
+            if (msg.includes('dizzy') || msg.includes('motion') || msg.includes('bus') || msg.includes('car sick')) {
+                return "Motion sickness from rural roads is very common! Sit in a well-ventilated area, sip water slowly, and try looking at the horizon. Ask your host for ginger (adrak) if available. Rest with eyes closed. If symptoms persist, please visit the nearest Primary Health Centre.";
+            }
+            
+            if (msg.includes('jetlag') || msg.includes('jet lag') || msg.includes('tired') || msg.includes('sleep')) {
+                return "Jetlag is tough! Try to adjust to Indian local time by staying awake during the day and getting natural sunlight. Drink plenty of water and avoid heavy meals late at night. Light exercise like walking helps. Your body should adjust in 2-3 days.";
+            }
+            
+            if (msg.includes('dehydrat') || msg.includes('thirsty') || msg.includes('water')) {
+                return "Dehydration is serious in India's climate! Drink clean, safe water regularly - small sips frequently work better than large amounts. ORS packets from any pharmacy are excellent. Rest in shade and avoid direct sun. If symptoms worsen, visit a Primary Health Centre immediately.";
+            }
+            
+            if (msg.includes('stomach') || msg.includes('nausea') || msg.includes('vomit') || msg.includes('food poison')) {
+                return "Stomach upset is common when trying new foods. Stay hydrated with clean water and ORS. Eat simple foods like rice, banana, or toast. Ask your host to avoid dairy and spicy foods temporarily. If vomiting persists or you have fever, please visit the nearest Primary Health Centre.";
+            }
+            
+            if (msg.includes('headache') || msg.includes('head pain')) {
+                return "Travel headaches are often from dehydration or stress. Drink water, rest in a cool, dark place, and try gentle head massage. Ensure you're eating regularly. Ask your host for a quiet room to rest. If the headache is severe or persistent, please visit the nearest Primary Health Centre.";
+            }
+            
+            if (msg.includes('heat') || msg.includes('hot') || msg.includes('sun')) {
+                return "Heat exhaustion needs immediate attention! Ask your host to help you move to shade or AC, remove excess clothing, and drink cool water slowly. Apply cool, wet cloths to skin. Rest completely and avoid going back in heat until you feel better. If symptoms worsen, visit a Primary Health Centre immediately.";
+            }
+            
+            if (msg.includes('bite') || msg.includes('insect') || msg.includes('mosquito') || msg.includes('itch')) {
+                return "Insect bites are common in rural areas. Clean the area with soap and water, apply ice if swollen. Avoid scratching to prevent infection. Ask your host for insect repellent and wear long sleeves in the evening. If there's severe swelling or signs of infection, visit a Primary Health Centre.";
+            }
+            
+            // General response
+            return currentUserType === 'host' ? 
+                "As a host, your role is crucial in helping the tourist feel safe. Provide comfort, clean water, a quiet place to rest, and most importantly, stay calm. If you're unsure about the severity, it's always better to contact the nearest Primary Health Centre or call 108 for emergency guidance." :
+                "I understand you're not feeling well during your homestay. Here's general advice: stay hydrated with safe water, rest in a cool place, eat simple foods, and don't hesitate to ask your host for help. If symptoms are severe or you're concerned, please visit the nearest Primary Health Centre or call 108.";
+        }
+
+        // Add message to chat
+        function addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            
+            let avatarIcon = '<i class="fas fa-user-md"></i>';
+            if (sender === 'user' || sender === 'tourist') avatarIcon = '<i class="fas fa-user"></i>';
+            else if (sender === 'host') avatarIcon = '<i class="fas fa-home"></i>';
+            else if (sender === 'system') avatarIcon = '<i class="fas fa-phone"></i>';
+            
+            avatar.innerHTML = avatarIcon;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content.replace(/\n/g, '<br>');
+            
+            // Add emergency styling for urgent messages
+            if (emergencyMode && sender === 'ai') {
+                messageDiv.classList.add('emergency');
+            }
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+
+        // Add loading message
+        function addLoadingMessage() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai';
+            loadingDiv.id = 'loading-' + Date.now();
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = '<i class="fas fa-user-md"></i>';
+            
+            const loadingContent = document.createElement('div');
+            loadingContent.className = 'message-content loading';
+            
+            const loadingText = emergencyMode ? 'Processing emergency...' : 'Analyzing symptoms...';
+            
+            loadingContent.innerHTML = `
+                <span>${loadingText}</span>
+                <div class="loading-dots">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            `;
+            
+            loadingDiv.appendChild(avatar);
+            loadingDiv.appendChild(loadingContent);
+            
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return loadingDiv.id;
+        }
+
+        // Remove loading message
+        function removeLoadingMessage(loadingId) {
+            const loadingElement = document.getElementById(loadingId);
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+        }
+
+        // Periodic connection check
+        setInterval(checkOllamaConnection, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - GramVista</title>
+    <link rel="stylesheet" href="style.css"> <!-- Optional if CSS is shared -->
+</head>
+<style>
+    /* Base Reset and Font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', serif;
+    height: 100vh;
+    background-color: #f0f8e0;
+    color: #2a3a1e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Video Background */
+.video-background {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.video-background video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(46, 87, 53, 0.2);
+    z-index: -1;
+}
+
+/* Container */
+.login-container {
+    background-color: rgba(240, 248, 230, 0.95);
+    border: 2px solid #5a724a;
+    border-radius: 12px;
+    padding: 30px 25px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: 0.3s ease;
+}
+
+.login-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #3a5a2a, #6b8e4e, #3a5a2a);
+    border-radius: 12px 12px 0 0;
+}
+
+/* Heading and Icon */
+h1, h2 {
+    text-align: center;
+    color: #2d4a1f;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+.village-icon {
+    width: 80px;
+    display: block;
+    margin: 0 auto 15px;
+    filter: hue-rotate(20deg) saturate(1.2);
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #3a5229;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #a3b899;
+    border-radius: 6px;
+    background-color: #f8fff0;
+    color: #2a3a1e;
+    transition: 0.2s border ease-in-out;
+}
+
+input:focus, select:focus {
+    border-color: #5a724a;
+    box-shadow: 0 0 5px rgba(90, 114, 74, 0.4);
+    outline: none;
+}
+
+/* Buttons */
+button, .role-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4a724a;
+    color: #f0f8e0;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+button:hover, .role-btn:hover {
+    background-color: #3a5a3a;
+    transform: translateY(-2px);
+}
+
+.role-btn.secondary {
+    background-color: #6b8e4e;
+}
+
+/* Back Button */
+.back-btn {
+    background-color: transparent;
+    border: 1px solid #4a724a;
+    color: #4a724a;
+    padding: 8px 16px;
+    font-size: 14px;
+    width: auto;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    background-color: rgba(74, 114, 74, 0.1);
+}
+
+/* Footer Links */
+.footer-links {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.footer-links a {
+    color: #4a724a;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 8px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+    color: #2f5128;
+}
+
+/* Icons */
+.role-icon {
+    font-size: 24px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Decorative Leaves (Optional) */
+.decoration {
+    position: absolute;
+    font-size: 24px;
+    color: #4a724a;
+}
+
+.left-leaf {
+    top: 20px;
+    left: 15px;
+}
+
+.right-leaf {
+    top: 20px;
+    right: 15px;
+}
+
+/* Visibility Control */
+.hidden {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .video-background {
+        background: url('https://example.com/green-village-fallback.jpg') no-repeat center center;
+        background-size: cover;
+    }
+
+    .video-background video {
+        display: none;
+    }
+
+    .login-container {
+        width: 90%;
+        padding: 20px;
+    }
+}
+</style>
+<body>
+    <div class="login-container">
+        <h1>User Registration</h1>
+        <form id="register-form">
+            <div class="form-group">
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" name="fullname" required>
+            </div>
+
+            <div class="form-group">
+                <label for="user-email">Email</label>
+                <input type="email" id="user-email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="user-password">Password</label>
+                <input type="password" id="user-password" name="password" required
+                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
+                    title="Password must contain at least 1 uppercase, 1 lowercase, 1 special character, and be at least 8 characters long">
+            </div>
+
+            <div class="form-group">
+                <label for="village">Village Name</label>
+                <input type="text" id="village" name="village" required>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="footer-links">
+            <a href="index.html">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            // Add backend POST request logic here
+            alert("Registered successfully! Redirecting...");
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+</html>

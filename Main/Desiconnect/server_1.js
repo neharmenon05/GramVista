@@ -1,0 +1,663 @@
+// enhanced-forum.js
+// Run with: node enhanced-forum.js
+// Then open browser to http://localhost:3000
+
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const path = require('path');
+const fs = require('fs');
+
+// Create Express app
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
+// In-memory storage for messages
+const messages = [];
+const users = new Map(); // Maps socket IDs to usernames
+
+// Serve static HTML
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Create enhanced HTML file content
+const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Olabs Community Forum</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      animation: slideIn 0.8s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-content {
+      padding: 30px;
+    }
+
+    .users-section {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border-left: 4px solid #4f46e5;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .users-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .users-header i {
+      color: #4f46e5;
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+
+    .user-count {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-left: 10px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-5px); }
+      60% { transform: translateY(-3px); }
+    }
+
+    .user-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin: 3px;
+      font-size: 0.9em;
+      font-weight: 500;
+      animation: fadeIn 0.5s ease-out;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .username-section {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      margin-bottom: 25px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .username-section h3 {
+      color: #4f46e5;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #e5e7eb;
+      border-radius: 25px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f9fafb;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4f46e5;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .btn {
+      padding: 15px 25px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
+    }
+
+    .chat-container {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    #message-container {
+      height: 450px;
+      overflow-y: auto;
+      padding: 20px;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 15px 20px;
+      border-radius: 18px;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      animation: messageSlide 0.4s ease-out;
+      border-left: 4px solid #4f46e5;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .message::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      transform: scaleX(0);
+      animation: progressBar 0.6s ease-out forwards;
+    }
+
+    @keyframes progressBar {
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes messageSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .message.system {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-left-color: #f59e0b;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .message .author {
+      font-weight: 700;
+      color: #4f46e5;
+      margin-right: 10px;
+      font-size: 1.1em;
+    }
+
+    .message .content {
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .message .time {
+      font-size: 0.8em;
+      color: #9ca3af;
+      float: right;
+      margin-top: 5px;
+    }
+
+    .message-input-section {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      padding: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .message-input-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    #message-input {
+      flex: 1;
+      padding: 15px 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 25px;
+      font-size: 16px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    #message-input:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .online-indicator {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+
+    #message-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #message-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+
+    #message-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 10px;
+    }
+
+    #message-container::-webkit-scrollbar-thumb:hover {
+      background: #4338ca;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      .header h1 {
+        font-size: 2em;
+      }
+      
+      .main-content {
+        padding: 20px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      #message-container {
+        height: 350px;
+      }
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(79, 70, 229, 0.3);
+      border-radius: 50%;
+      border-top-color: #4f46e5;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-comments"></i> Olabs Community Forum</h1>
+      <p>Connect, share, and engage with the community</p>
+    </div>
+
+    <div class="main-content">
+      <div class="users-section">
+        <div class="users-header">
+          <i class="fas fa-users"></i>
+          <h3>Online Members</h3>
+          <span class="user-count" id="user-count">0</span>
+        </div>
+        <div id="users"></div>
+      </div>
+
+      <div class="username-section" id="username-form">
+        <h3><i class="fas fa-user-plus"></i> Join the Conversation</h3>
+        <div class="input-group">
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username-input" placeholder="Enter your username" maxlength="20">
+          </div>
+          <button class="btn btn-primary" id="username-button">
+            <i class="fas fa-sign-in-alt"></i>
+            Join Forum
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-container" id="chat-section" style="display: none;">
+        <div id="message-container"></div>
+        <div class="message-input-section">
+          <div class="message-input-group">
+            <input type="text" id="message-input" placeholder="Type your message..." maxlength="500">
+            <button class="btn btn-primary" id="send-button">
+              <i class="fas fa-paper-plane"></i>
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const socket = io();
+    
+    const usernameForm = document.getElementById('username-form');
+    const usernameInput = document.getElementById('username-input');
+    const usernameButton = document.getElementById('username-button');
+    const chatSection = document.getElementById('chat-section');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const messageContainer = document.getElementById('message-container');
+    const userCount = document.getElementById('user-count');
+    const usersElement = document.getElementById('users');
+    
+    let username = '';
+
+    usernameButton.addEventListener('click', joinForum);
+    usernameInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') joinForum();
+    });
+
+    function joinForum() {
+      const inputUsername = usernameInput.value.trim();
+      if (inputUsername && inputUsername.length >= 2) {
+        usernameButton.innerHTML = '<div class="loading"></div> Joining...';
+        usernameButton.disabled = true;
+        
+        setTimeout(() => {
+          username = inputUsername;
+          socket.emit('user_join', username);
+          usernameForm.style.display = 'none';
+          chatSection.style.display = 'block';
+          messageInput.focus();
+          
+          chatSection.style.animation = 'slideIn 0.6s ease-out';
+        }, 800);
+      } else {
+        usernameInput.style.animation = 'shake 0.5s ease-in-out';
+        setTimeout(() => {
+          usernameInput.style.animation = '';
+        }, 500);
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message && username) {
+        sendButton.innerHTML = '<div class="loading"></div>';
+        sendButton.disabled = true;
+        
+        socket.emit('chat_message', {
+          text: message,
+          author: username,
+          timestamp: new Date().toISOString()
+        });
+        
+        messageInput.value = '';
+        
+        setTimeout(() => {
+          sendButton.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+          sendButton.disabled = false;
+          messageInput.focus();
+        }, 300);
+      }
+    }
+
+    function displayMessage(message) {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'message';
+      
+      const time = new Date(message.timestamp).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      messageElement.innerHTML = \`
+        <div>
+          <span class="author">\${message.author}:</span>
+          <span class="content">\${message.text}</span>
+          <span class="time">\${time}</span>
+        </div>
+      \`;
+      
+      messageContainer.appendChild(messageElement);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+
+    function updateUsers(users) {
+      userCount.textContent = users.length;
+      usersElement.innerHTML = users.map(user => 
+        \`<span class="user-tag">
+          <span class="online-indicator"></span>\${user}
+        </span>\`
+      ).join('');
+    }
+
+    socket.on('chat_history', messages => {
+      messageContainer.innerHTML = '';
+      messages.forEach(displayMessage);
+    });
+
+    socket.on('chat_message', message => {
+      displayMessage(message);
+    });
+
+    socket.on('user_list', users => {
+      updateUsers(users);
+    });
+
+    socket.on('system_message', message => {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'message system';
+      messageElement.innerHTML = \`<em><i class="fas fa-info-circle"></i> \${message}</em>\`;
+      messageContainer.appendChild(messageElement);
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    });
+  </script>
+</body>
+</html>
+`;
+
+// Write HTML file
+fs.writeFileSync(path.join(__dirname, 'index.html'), htmlContent);
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+  console.log('New connection:', socket.id);
+  
+  socket.emit('chat_history', messages);
+  
+  socket.on('user_join', (username) => {
+    users.set(socket.id, username);
+    
+    const joinMessage = `${username} has joined the forum`;
+    socket.broadcast.emit('system_message', joinMessage);
+    
+    io.emit('user_list', Array.from(users.values()));
+    
+    console.log(`${username} joined`);
+  });
+  
+  socket.on('chat_message', (message) => {
+    console.log(`Message from ${message.author}: ${message.text}`);
+    messages.push(message);
+    
+    if (messages.length > 100) {
+      messages.shift();
+    }
+    
+    io.emit('chat_message', message);
+  });
+  
+  socket.on('disconnect', () => {
+    const username = users.get(socket.id);
+    if (username) {
+      users.delete(socket.id);
+      
+      const leaveMessage = `${username} has left the forum`;
+      io.emit('system_message', leaveMessage);
+      
+      io.emit('user_list', Array.from(users.values()));
+      
+      console.log(`${username} disconnected`);
+    }
+  });
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Enhanced Forum Server running at http://localhost:${PORT}`);
+  console.log('Share this address with people on your local network to let them join');
+});

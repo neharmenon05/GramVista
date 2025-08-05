@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GramVista - Login</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #2a3a1e;
+            overflow: hidden;
+            background-color:#f0f0c6f4;
+        }
+        
+        /* Video background container */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        /* Video styling */
+        .video-background video {
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Greenish overlay */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color:#f0f0c6f4;
+            z-index: -1;
+        }
+        
+        .login-container {
+            background-color: rgba(240, 248, 230, 0.93);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 350px;
+            border: 2px solid #5a724a;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .login-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: #3a5a2a;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d4a1f;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .village-icon {
+            display: block;
+            width: 80px;
+            margin: 0 auto 20px;
+            filter: hue-rotate(20deg) saturate(1.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #3a5229;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #a3b899;
+            border-radius: 5px;
+            background-color: #f8fff0;
+            font-size: 16px;
+            box-sizing: border-box;
+            color: #2a3a1e;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #5a724a;
+            box-shadow: 0 0 5px rgba(90, 114, 74, 0.5);
+        }
+        
+        button, .role-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #2a422a;
+            color: #f0f8e0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover, .role-btn:hover {
+            background-color: #436843;
+            transform: translateY(-1px);
+        }
+        
+        .role-btn.secondary {
+            background-color:#2a422a;
+        }
+        
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .footer-links a {
+            color: #4a724a;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+            color: #3a5a3a;
+        }
+        
+        .decoration {
+            position: absolute;
+            font-size: 24px;
+            color: #4a724a;
+        }
+        
+        .left-leaf {
+            top: 20px;
+            left: 15px;
+        }
+        
+        .right-leaf {
+            top: 20px;
+            right: 15px;
+        }
+        
+        /* Hidden forms */
+        .hidden {
+            display: none;
+        }
+        
+        .back-btn {
+            background-color: transparent;
+            color: #4a724a;
+            border: 1px solid #4a724a;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            width: auto;
+        }
+        
+        .back-btn:hover {
+            background-color: rgba(74, 114, 74, 0.1);
+        }
+        
+        /* Role selection screen */
+        .role-selection {
+            text-align: center;
+        }
+        
+        .role-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .vendor-login-form {
+            display: none; /* Initially hidden */
+        }
+        
+        /* Fallback for mobile devices */
+        @media (max-width: 768px) {
+            .video-background {
+                background: url('https://example.com/green-village-fallback.jpg') no-repeat center center;
+                background-size: cover;
+            }
+            
+            .video-background video {
+                display: none;
+            }
+            
+            .login-container {
+                width: 85%;
+                padding: 20px;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop id="bg-video">
+            <source src="C:\Users\dedee\Downloads\Infosys\village_login.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+    
+    <!-- Login Container -->
+    <div class="login-container" id="main-container">
+        <span class="decoration left-leaf"></span>
+        <span class="decoration right-leaf"></span>
+        
+        <img src="..\photos\logo.png" alt="Village Icon" class="village-icon">
+        
+        <!-- Role Selection Screen -->
+        <div id="role-selection">
+            <h1>Welcome to Gram Vista</h1>
+            <p>Please select your login type:</p>
+            
+            <div class="form-group">
+                <button class="role-btn" onclick="showLoginForm('user')">
+                    <span class="role-icon">👤</span>
+                    Village User Login
+                </button>
+                <button class="role-btn secondary" onclick="showLoginForm('vendor')">
+                    <span class="role-icon">🏪</span>
+                    Village Vendor Login
+                </button>
+            </div>
+        </div>
+        
+        <!-- User Login Form -->
+        <form id="user-login-form" class="hidden">
+            <button type="button" class="back-btn" onclick="backToRoleSelection()">← Back</button>
+            <h2>User Login</h2>
+            
+            <div class="form-group">
+                <label for="user-username">Email</label>
+                <input type="email" id="user-username" name="username" placeholder="Enter your email"
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                    title="Please enter a valid email address (e.g., example@domain.com)"
+                    required>
+            </div>
+
+        <div class="form-group">
+            <label for="user-password">Password</label>
+            <input type="password" id="user-password" name="password"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
+                title="Password must contain at least 1 uppercase, 1 lowercase, 1 special character, and be at least 8 characters long"
+                placeholder="Enter your password"
+                required>
+        </div>
+
+            
+            <button type="submit">Enter as User</button>
+            
+            <div class="footer-links">
+                <a href="/forgot-password?type=user">Forgot Password?</a>
+                <a href="/user-register">Join as User</a>
+            </div>
+        </form>
+        
+        <!-- Vendor Login Form -->
+        <form id="vendor-login-form" class="hidden">
+            <button type="button" class="back-btn" onclick="backToRoleSelection()">← Back</button>
+            <h2>Vendor Login</h2>
+            
+            <div class="form-group">
+    <label for="vendor-username">Email</label>
+    <input type="email" id="vendor-username" name="username" placeholder="Enter your email"
+           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+           title="Please enter a valid email address (e.g., vendor@example.com)"
+           required>
+</div>
+
+<div class="form-group">
+    <label for="vendor-password">Password</label>
+    <input type="password" id="vendor-password" name="password"
+           pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}"
+           title="Password must contain at least 1 uppercase, 1 lowercase, 1 special character, and be at least 8 characters long"
+           placeholder="Enter your password"
+           required>
+</div>
+
+            
+            <div class="form-group">
+                <label for="vendor-code">Vendor Code</label>
+                <input type="text" id="vendor-code" name="vendor_code" placeholder="Enter your vendor code" required>
+            </div>
+            
+            <button type="submit">Enter as Vendor</button>
+            
+            <div class="footer-links">
+                <a href="/forgot-password?type=vendor">Forgot Password?</a>
+                <a href="/vendor-register">Apply as Vendor</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // Show the appropriate login form based on role selection
+        function showLoginForm(role) {
+            document.getElementById('role-selection').classList.add('hidden');
+            
+            if (role === 'user') {
+                document.getElementById('user-login-form').classList.remove('hidden');
+            } else if (role === 'vendor') {
+                document.getElementById('vendor-login-form').classList.remove('hidden');
+            }
+        }
+        
+        // Return to role selection
+        function backToRoleSelection() {
+            document.getElementById('user-login-form').classList.add('hidden');
+            document.getElementById('vendor-login-form').classList.add('hidden');
+            document.getElementById('role-selection').classList.remove('hidden');
+        }
+        
+        // Video autoplay fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('bg-video');
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    video.controls = false;
+                    console.log("Video autoplay prevented");
+                });
+            }
+            
+            // Check if coming back from a failed login attempt with a role parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const loginType = urlParams.get('type');
+            
+            if (loginType === 'user') {
+                showLoginForm('user');
+            } else if (loginType === 'vendor') {
+                showLoginForm('vendor');
+            }
+        });
+        document.querySelectorAll("form").forEach(form => {
+    form.addEventListener("submit", function (e) {
+        const password = form.querySelector("input[type='password']").value;
+        const email = form.querySelector("input[type='email']").value;
+
+        const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+
+        if (!emailPattern.test(email)) {
+            alert("Please enter a valid email address.");
+            e.preventDefault();
+        } else if (!passwordPattern.test(password)) {
+            alert("Password must contain at least 1 uppercase, 1 lowercase, 1 special character, and be at least 8 characters.");
+            e.preventDefault();
+        } else {
+            // 🚨 Prevent actual form submission
+            e.preventDefault();
+
+            // ✅ Redirect based on form type
+        if (form.id === "user-login-form") {
+            window.location.href = "../User/usermain.html";
+        } else if (form.id === "vendor-login-form") {
+            window.location.href = "../Vendor/vendor_dashboard.html";
+        }
+        
+        }
+    });
+});
+    </script>
+</body>
+</html>

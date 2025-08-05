@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rural Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8f1e9;
+        }
+
+        header {
+            background: linear-gradient(90deg, #2a9d8f, #e9c46a);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #f4a261;
+        }
+
+        .hero {
+            background: url("https://th.bing.com/th/id/OIP.a3I7DurhhVPY-lYHnDuWfwHaEJ?w=331&h=186&c=7&r=0&o=7&dpr=1.2&pid=1.7&rm=3") center/cover;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .filter-container {
+            display: flex;
+            padding: 1rem 2rem;
+            background: white;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filter-container select, .filter-container input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            background: #fff;
+        }
+
+        .filter-types {
+            background: white;
+            padding: 1rem;
+            max-width: 250px;
+            border-right: 1px solid #ddd;
+        }
+
+        .filter-types h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #264653;
+        }
+
+        .filter-types label {
+            display: block;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .price-filter {
+            margin-top: 1rem;
+        }
+
+        .price-filter input {
+            width: 80px;
+            margin: 0.5rem 0;
+        }
+
+        .price-filter button {
+            background: #e76f51;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .price-filter button:hover {
+            background: #d65f43;
+        }
+
+        .main-content {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card h3 {
+            font-size: 1.3rem;
+            margin: 0.5rem 1rem;
+            color: #264653;
+        }
+
+        .product-card p {
+            margin: 0.5rem 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .product-card .price {
+            font-weight: bold;
+            color: #e76f51;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-card button {
+            background: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            width: 100%;
+            border-radius: 0 0 12px 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .product-card button:hover {
+            background: #21867a;
+        }
+
+        .product-details {
+            display: none;
+            padding: 2rem;
+            max-width: 1000px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 2rem;
+        }
+
+        .product-details img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .product-details .details-content {
+            flex: 1;
+        }
+
+        .product-details h2 {
+            font-size: 2rem;
+            color: #264653;
+            margin-bottom: 1rem;
+        }
+
+        .product-details .price {
+            font-size: 1.5rem;
+            color: #e76f51;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .product-details .description {
+            color: #333;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        .product-details .type {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .product-details .quantity {
+            margin-bottom: 1.5rem;
+        }
+
+        .product-details .quantity input {
+            width: 60px;
+            padding: 0.5rem;
+            margin: 0 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .product-details button {
+            background: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 0.5rem;
+        }
+
+        .product-details button:hover {
+            background: #21867a;
+        }
+
+        .cart {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .cart h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #264653;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-item span {
+            flex: 1;
+        }
+
+        .cart-item button {
+            background: #e63946;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .bill-summary {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f1e9;
+            border-radius: 8px;
+        }
+
+        .bill-summary h3 {
+            font-size: 1.2rem;
+            color: #264653;
+            margin-bottom: 0.5rem;
+        }
+
+        .bill-summary p {
+            font-size: 1rem;
+            color: #333;
+            margin: 0.5rem 0;
+        }
+
+        .bill-summary .total {
+            font-weight: bold;
+            color: #e76f51;
+        }
+
+        .close-cart {
+            background: #e63946;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        footer {
+            background: linear-gradient(90deg, #2a9d8f, #e9c46a);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .filter-types {
+                max-width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .products {
+                grid-template-columns: 1fr;
+            }
+
+            .cart {
+                width: 100%;
+            }
+
+            .product-details {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .product-details img {
+                max-width: 100%;
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .price-filter input {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Rural Marketplace</h1>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#products">Products</a>
+            <a href="#" id="cart-toggle">Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h2>Explore Authentic Rural Art & Produce</h2>
+    </div>
+
+    <div class="filter-container">
+        <select id="category-filter">
+            <option value="all">All Categories</option>
+            <option value="Art">Art</option>
+            <option value="Farm Produce">Farm Produce</option>
+        </select>
+    </div>
+
+    <div class="main-content">
+        <div class="filter-types" id="type-filter">
+            <h3>Filter by Type</h3>
+            <!-- Type filters will be dynamically added here -->
+            <div class="price-filter">
+                <h3>Price Range</h3>
+                <label>Min: <input type="number" id="min-price" placeholder="0" min="0"></label>
+                <label>Max: <input type="number" id="max-price" placeholder="100" min="0"></label>
+                <button onclick="applyPriceFilter()">Apply</button>
+            </div>
+        </div>
+        <section class="products" id="products">
+            <!-- Products will be dynamically added here -->
+        </section>
+    </div>
+
+    <section class="product-details" id="product-details">
+        <!-- Product details will be dynamically added here -->
+    </section>
+
+    <div class="cart" id="cart">
+        <h2>Your Cart</h2>
+        <div id="cart-items"></div>
+        <div class="bill-summary">
+            <h3>Bill Summary</h3>
+            <p>Subtotal: $<span id="cart-subtotal">0.00</span></p>
+            <p>Tax (5%): $<span id="cart-tax">0.00</span></p>
+            <p class="total">Total: $<span id="cart-total">0.00</span></p>
+        </div>
+        <button class="close-cart" id="close-cart">Close Cart</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Rural Marketplace. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const products = [
+            { id: 1, name: "Handwoven Basket", price: 25.00, image: "https://i.pinimg.com/originals/fc/c4/b9/fcc4b9f8226afb540b39bc5bca78fe29.jpg", category: "Art", description: "This handwoven basket is crafted by skilled rural artisans using natural fibers and traditional techniques passed down through generations. Perfect for storage or as a decorative piece.", type: "Woven" },
+            { id: 2, name: "Organic Honey", price: 12.00, image: "https://www.nirvanaorganic.in/cdn/shop/articles/Forest-honey-jar.jpg?v=1734523514&width=1500", category: "Farm Produce", description: "Pure, organic honey sourced from local beehives in pristine rural areas. Free from additives, this honey offers a rich, natural sweetness ideal for culinary use or health benefits.", type: "Honey" },
+            { id: 3, name: "Clay Pottery", price: 35.00, image: "https://i5.walmartimages.com/asr/36178d7d-ed04-4f1b-9564-5073de8b1671_1.849738ba569e13201265ab0261401114.jpeg", category: "Art", description: "Handcrafted clay pottery featuring intricate designs, fired and glazed by local artisans. Each piece is unique, making it a stunning addition to any home decor.", type: "Pottery" },
+            { id: 4, name: "Fresh Tomatoes", price: 5.00, image: "https://images.heb.com/is/image/HEBGrocery/000471240", category: "Farm Produce", description: "Juicy, organic tomatoes grown in fertile rural soil without pesticides. Perfect for salads, sauces, or fresh eating, these tomatoes are bursting with flavor.", type: "Vegetable" },
+            { id: 5, name: "Wooden Sculpture", price: 50.00, image: "https://s-media-cache-ak0.pinimg.com/originals/d2/7a/b7/d27ab757b7d85782b139f8fb7a4c130d.jpg", category: "Art", description: "A unique wooden sculpture carved by master craftsmen from sustainable local timber. Its intricate details make it a standout piece for collectors or home decor enthusiasts.", type: "Woodwork" },
+            { id: 6, name: "Homemade Jam", price: 8.00, image: "https://myislandbistrokitchen.com/wp-content/uploads/2023/07/DSC_0617.jpg", category: "Farm Produce", description: "Delicious homemade jam crafted from fresh, locally sourced fruits. Made in small batches with traditional recipes, this jam is perfect for breakfast or gifting.", type: "Preserve" },
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let currentCategory = 'all';
+        let selectedTypes = [];
+        let minPrice = 0;
+        let maxPrice = Infinity;
+
+        const productContainer = document.querySelector('.products');
+        const productDetailsContainer = document.getElementById('product-details');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartSubtotalElement = document.getElementById('cart-subtotal');
+        const cartTaxElement = document.getElementById('cart-tax');
+        const cartTotalElement = document.getElementById('cart-total');
+        const cartCountElement = document.getElementById('cart-count');
+        const cartElement = document.getElementById('cart');
+        const cartToggle = document.getElementById('cart-toggle');
+        const closeCart = document.getElementById('close-cart');
+        const categoryFilter = document.getElementById('category-filter');
+        const typeFilterContainer = document.getElementById('type-filter');
+        const minPriceInput = document.getElementById('min-price');
+        const maxPriceInput = document.getElementById('max-price');
+
+        function renderTypeFilters() {
+            const types = [...new Set(products
+                .filter(p => currentCategory === 'all' || p.category === currentCategory)
+                .map(p => p.type))];
+            typeFilterContainer.innerHTML = '<h3>Filter by Type</h3>';
+            types.forEach(type => {
+                const label = document.createElement('label');
+                label.innerHTML = `
+                    <input type="checkbox" value="${type}" ${selectedTypes.includes(type) ? 'checked' : ''}>
+                    ${type}
+                `;
+                typeFilterContainer.appendChild(label);
+            });
+            typeFilterContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    selectedTypes = Array.from(typeFilterContainer.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(input => input.value);
+                    renderProducts();
+                });
+            });
+        }
+
+        function applyPriceFilter() {
+            minPrice = parseFloat(minPriceInput.value) || 0;
+            maxPrice = parseFloat(maxPriceInput.value) || Infinity;
+            renderProducts();
+        }
+
+        function renderProducts() {
+            productContainer.style.display = 'grid';
+            productDetailsContainer.style.display = 'none';
+            productContainer.innerHTML = '';
+            let filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategory);
+            if (selectedTypes.length > 0) {
+                filteredProducts = filteredProducts.filter(p => selectedTypes.includes(p.type));
+            }
+            filteredProducts = filteredProducts.filter(p => p.price >= minPrice && p.price <= maxPrice);
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                    <p>${product.category} - ${product.type}</p>
+                    <button onclick="addToCart(${product.id}, 1)">Add to Cart</button>
+                `;
+                productCard.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON') showProductDetails(product.id);
+                });
+                productContainer.appendChild(productCard);
+            });
+        }
+
+        function showProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            productContainer.style.display = 'none';
+            productDetailsContainer.style.display = 'flex';
+            productDetailsContainer.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <div class="details-content">
+                    <h2>${product.name}</h2>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                    <p class="type">Type: ${product.type} | Category: ${product.category}</p>
+                    <p class="description">${product.description}</p>
+                    <div class="quantity">
+                        <label for="quantity-${product.id}">Quantity:</label>
+                        <input type="number" id="quantity-${product.id}" value="1" min="1">
+                    </div>
+                    <button onclick="addToCart(${product.id}, parseInt(document.getElementById('quantity-${product.id}').value))">Add to Cart</button>
+                    <button onclick="renderProducts()">Back to Products</button>
+                </div>
+            `;
+        }
+
+        function renderCart() {
+            cartItemsContainer.innerHTML = '';
+            let subtotal = 0;
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.classList.add('cart-item');
+                cartItem.innerHTML = `
+                    <span>${item.name} - $${item.price.toFixed(2)} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</span>
+                    <button onclick="removeFromCart(${item.id})">Remove</button>
+                `;
+                cartItemsContainer.appendChild(cartItem);
+                subtotal += item.price * item.quantity;
+            });
+            const tax = subtotal * 0.05; // 5% tax
+            const total = subtotal + tax;
+            cartSubtotalElement.textContent = subtotal.toFixed(2);
+            cartTaxElement.textContent = tax.toFixed(2);
+            cartTotalElement.textContent = total.toFixed(2);
+            cartCountElement.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function addToCart(productId, quantity) {
+            const product = products.find(p => p.id === productId);
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.quantity += quantity;
+            } else {
+                cart.push({ ...product, quantity });
+            }
+            renderCart();
+        }
+
+        function removeFromCart(productId) {
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem.quantity > 1) {
+                cartItem.quantity -= 1;
+            } else {
+                cart = cart.filter(item => item.id !== productId);
+            }
+            renderCart();
+        }
+
+        categoryFilter.addEventListener('change', () => {
+            currentCategory = categoryFilter.value;
+            selectedTypes = [];
+            minPrice = 0;
+            maxPrice = Infinity;
+            minPriceInput.value = '';
+            maxPriceInput.value = '';
+            renderTypeFilters();
+            renderProducts();
+        });
+
+        cartToggle.addEventListener('click', () => {
+            cartElement.style.display = 'block';
+        });
+
+        closeCart.addEventListener('click', () => {
+            cartElement.style.display = 'none';
+        });
+
+        renderTypeFilters();
+        renderProducts();
+        renderCart();
+    </script>
+</body>
+</html>

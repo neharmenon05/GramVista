@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rural Income Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Main header styling */
+        .main-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .main-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .main-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        /* Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form styling */
+        .form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: #f8f9ff;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .skill-checkbox:hover {
+            background: #e8ebff;
+        }
+
+        .skill-checkbox input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .slider-container {
+            margin-top: 0.5rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        /* Tips section */
+        .tips-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .tips-section h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            margin: 0.5rem 0;
+            font-weight: 500;
+        }
+
+        /* Button styling */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* Results section */
+        .results-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        /* Income cards */
+        .income-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .income-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .income-card h3 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .income-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* Skills breakdown table */
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breakdown-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .breakdown-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        /* Skill cards */
+        .skill-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 0.5rem 0;
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Info cards */
+        .info-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .info-card h4 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .info-card ol {
+            margin-left: 1.5rem;
+        }
+
+        .info-card li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Success story */
+        .success-story {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 5px solid #4facfe;
+            margin: 1rem 0;
+            color: #2c3e50;
+            font-style: italic;
+        }
+
+        /* Expandable sections */
+        .expandable {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+
+        .expandable-header {
+            background: #f8f9ff;
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .expandable-header:hover {
+            background: #e8ebff;
+        }
+
+        .expandable-content {
+            padding: 1rem;
+            display: none;
+            background: white;
+        }
+
+        .expandable-content.show {
+            display: block;
+        }
+
+        /* Map container */
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Audio controls */
+        .audio-container {
+            background: #f8f9ff;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            margin-top: 2rem;
+        }
+
+        .footer h3 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-info {
+            background: #e7f3ff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Header -->
+        <div class="main-header">
+            <h1><i class="fas fa-home"></i> Rural Income Simulator</h1>
+            <p>Discover your income potential using local village skills and resources</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h3>Your Information</h3>
+                <form id="incomeForm">
+                    <div class="form-group">
+                        <label for="fullName">Enter Your Full Name:</label>
+                        <input type="text" id="fullName" placeholder="e.g., Ram Kumar / Lakshmi Devi" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="villageName">Enter Your Village Name:</label>
+                        <input type="text" id="villageName" placeholder="e.g., Rampur, Uttar Pradesh / Kanchipuram, Tamil Nadu" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select your skills or assets:</label>
+                        <div class="skills-container" id="skillsContainer">
+                            <!-- Skills will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="availableHours">Hours available per week: <span id="hoursValue">25</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="availableHours" class="slider" min="10" max="70" value="25">
+                            <div class="slider-value">
+                                <span id="hoursDisplay">25 hours/week</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="language">Select Your Preferred Language:</label>
+                        <select id="language" required>
+                            <!-- Languages will be populated by JavaScript -->
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn" id="generateBtn">
+                        <i class="fas fa-calculator"></i> Generate My Income Plan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="tips-section">
+                <h3>Quick Tips</h3>
+                <div class="tip-box">
+                    <i class="fas fa-lightbulb"></i> Combine 2-3 skills for higher income potential
+                </div>
+                <div class="tip-box">
+                    <i class="fas fa-calendar-alt"></i> Festival seasons boost earnings significantly
+                </div>
+                <div class="tip-box">
+                    <i class="fas fa-seedling"></i> Start small and gradually expand
+                </div>
+                <div class="tip-box">
+                    <i class="fas fa-users"></i> Connect with local customers
+                </div>
+                <div class="tip-box">
+                    <i class="fas fa-mobile-alt"></i> Use mobile for taking orders
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div id="loadingSpinner" class="spinner hidden"></div>
+            <div id="resultsContent" class="hidden">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>Rural Income Simulator</h3>
+            <p>Empowering rural communities through skill-based income generation</p>
+            <p><em>Developed to support rural entrepreneurship and economic development</em></p>
+            <p>Made for Rural India</p>
+        </div>
+    </div>
+
+    <!-- Include Leaflet JS for maps -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    
+    <script>
+        // Skills data
+        const SKILLS = [
+            "Home Food Preparation",
+            "Dairy Farming", 
+            "Vegetable Farming",
+            "Handicrafts & Pottery",
+            "Tailoring & Embroidery",
+            "Poultry Farming",
+            "Small Shop/Kirana Store",
+            "Bicycle/Motor Repair",
+            "Carpentry/Woodwork",
+            "Agricultural Labor",
+            "Fruit Vendor/Sales",
+            "Tutoring Children",
+            "Rickshaw/Auto Driver",
+            "Livestock Rearing"
+        ];
+
+        // Language mapping
+        const LANGUAGES = {
+            "English": "en",
+            "Hindi": "hi", 
+            "Tamil": "ta",
+            "Telugu": "te",
+            "Marathi": "mr",
+            "Punjabi": "pa",
+            "Gujarati": "gu",
+            "Bengali": "bn",
+            "Kannada": "kn",
+            "Malayalam": "ml",
+            "Odia": "or",
+            "Assamese": "as",
+            "Urdu": "ur",
+            "Sanskrit": "sa",
+            "Nepali": "ne",
+            "Sindhi": "sd",
+            "Konkani": "gom",
+            "Manipuri": "mni",
+            "Bodo": "brx",
+            "Dogri": "doi"
+        };
+
+        // Income rates data
+        const INCOME_RATES = {
+            "Home Food Preparation": {"rate_per_hour": 80, "seasonal_multiplier": 1.3},
+            "Dairy Farming": {"rate_per_hour": 60, "seasonal_multiplier": 1.1},
+            "Vegetable Farming": {"rate_per_hour": 50, "seasonal_multiplier": 1.8},
+            "Handicrafts & Pottery": {"rate_per_hour": 90, "seasonal_multiplier": 1.4},
+            "Tailoring & Embroidery": {"rate_per_hour": 70, "seasonal_multiplier": 1.2},
+            "Poultry Farming": {"rate_per_hour": 55, "seasonal_multiplier": 1.0},
+            "Small Shop/Kirana Store": {"rate_per_hour": 85, "seasonal_multiplier": 1.1},
+            "Bicycle/Motor Repair": {"rate_per_hour": 100, "seasonal_multiplier": 1.0},
+            "Carpentry/Woodwork": {"rate_per_hour": 95, "seasonal_multiplier": 1.2},
+            "Agricultural Labor": {"rate_per_hour": 45, "seasonal_multiplier": 1.5},
+            "Fruit Vendor/Sales": {"rate_per_hour": 75, "seasonal_multiplier": 1.3},
+            "Tutoring Children": {"rate_per_hour": 60, "seasonal_multiplier": 1.0},
+            "Rickshaw/Auto Driver": {"rate_per_hour": 80, "seasonal_multiplier": 1.1},
+            "Livestock Rearing": {"rate_per_hour": 65, "seasonal_multiplier": 1.1}
+        };
+
+        // Season recommendations
+        const SEASON_RECOMMENDATIONS = {
+            "Home Food Preparation": "Festival seasons (Oct-Jan), Wedding season (Nov-May)",
+            "Dairy Farming": "Year-round with peak in winter months",
+            "Vegetable Farming": "Kharif (Jun-Oct) for seasonal vegetables, Rabi (Nov-Apr) for winter crops",
+            "Handicrafts & Pottery": "Festival seasons (Oct-Jan), Wedding season (Dec-May)",
+            "Tailoring & Embroidery": "Festival and wedding seasons (Oct-May)",
+            "Poultry Farming": "Year-round with higher demand during festivals",
+            "Small Shop/Kirana Store": "Year-round with peak during festival seasons",
+            "Bicycle/Motor Repair": "Year-round, especially during farming seasons",
+            "Carpentry/Woodwork": "Post-harvest season (Nov-Mar) when farmers have income",
+            "Agricultural Labor": "Planting season (Jun-Jul), Harvest season (Oct-Nov, Mar-Apr)",
+            "Fruit Vendor/Sales": "Summer season (Mar-Jun) for seasonal fruits",
+            "Tutoring Children": "Academic year (Jun-Mar) with breaks during harvest",
+            "Rickshaw/Auto Driver": "Year-round with peak during market days and festivals",
+            "Livestock Rearing": "Year-round with breeding season focus"
+        };
+
+        // Setup requirements
+        const SETUP_REQUIREMENTS = {
+            "Home Food Preparation": "Clean kitchen space, basic utensils, packaging materials, local license",
+            "Dairy Farming": "Cattle shed, fodder storage, milk containers, veterinary contact",
+            "Vegetable Farming": "Seeds, basic tools, water access, compost area, small plot",
+            "Handicrafts & Pottery": "Clay/materials, basic tools, workspace, local market contact",
+            "Tailoring & Embroidery": "Sewing machine, threads, fabric, measuring tools, workspace",
+            "Poultry Farming": "Chicken coop, feed storage, water system, basic veterinary supplies",
+            "Small Shop/Kirana Store": "Small space/room, initial stock, weighing scale, storage",
+            "Bicycle/Motor Repair": "Basic tools, spare parts, workspace, repair manual",
+            "Carpentry/Woodwork": "Hand tools, wood stock, workspace, measuring instruments",
+            "Agricultural Labor": "Physical fitness, basic farming knowledge, tools (if not provided)",
+            "Fruit Vendor/Sales": "Basket/cart, weighing scale, daily market space rent",
+            "Tutoring Children": "Basic education materials, notebook, blackboard/slate",
+            "Rickshaw/Auto Driver": "Vehicle (own/rent), license, route knowledge, maintenance",
+            "Livestock Rearing": "Animal shelter, feed, water source, veterinary contact"
+        };
+
+        // Training recommendations
+        const TRAINING_RECOMMENDATIONS = {
+            "Home Food Preparation": "Food safety, packaging, local food authority guidelines",
+            "Dairy Farming": "Modern dairy practices, animal health, milk quality",
+            "Vegetable Farming": "Organic methods, pest control, seasonal planning",
+            "Handicrafts & Pottery": "Design improvement, finishing techniques, pricing",
+            "Tailoring & Embroidery": "New designs, machine maintenance, customer relations",
+            "Poultry Farming": "Chicken health, feed mixing, egg production optimization",
+            "Small Shop/Kirana Store": "Inventory management, customer service, basic accounting",
+            "Bicycle/Motor Repair": "Engine basics, common problems, parts sourcing",
+            "Carpentry/Woodwork": "Joint techniques, wood treatment, tool maintenance",
+            "Agricultural Labor": "Modern farming techniques, equipment operation",
+            "Fruit Vendor/Sales": "Quality selection, storage, customer relations",
+            "Tutoring Children": "Teaching methods, child psychology, curriculum basics",
+            "Rickshaw/Auto Driver": "Vehicle maintenance, customer service, route optimization",
+            "Livestock Rearing": "Animal breeding, disease prevention, feed optimization"
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSkills();
+            initializeLanguages();
+            initializeSlider();
+            initializeForm();
+        });
+
+        function initializeSkills() {
+            const skillsContainer = document.getElementById('skillsContainer');
+            SKILLS.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.className = 'skill-checkbox';
+                skillDiv.innerHTML = `
+                    <input type="checkbox" id="skill_${skill.replace(/\s+/g, '_')}" value="${skill}">
+                    <label for="skill_${skill.replace(/\s+/g, '_')}">${skill}</label>
+                `;
+                skillsContainer.appendChild(skillDiv);
+            });
+        }
+
+        function initializeLanguages() {
+            const languageSelect = document.getElementById('language');
+            Object.keys(LANGUAGES).forEach(language => {
+                const option = document.createElement('option');
+                option.value = language;
+                option.textContent = language;
+                languageSelect.appendChild(option);
+            });
+            languageSelect.value = 'English'; // Default to English
+        }
+
+        function initializeSlider() {
+            const slider = document.getElementById('availableHours');
+            const hoursValue = document.getElementById('hoursValue');
+            const hoursDisplay = document.getElementById('hoursDisplay');
+
+            slider.addEventListener('input', function() {
+                const value = this.value;
+                hoursValue.textContent = value;
+                hoursDisplay.textContent = `${value} hours/week`;
+            });
+        }
+
+        function initializeForm() {
+            const form = document.getElementById('incomeForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateIncomePlan();
+            });
+        }
+
+        function getSelectedSkills() {
+            const checkboxes = document.querySelectorAll('#skillsContainer input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const form = document.getElementById('incomeForm');
+            form.insertBefore(alertDiv, form.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function calculateIncomeBreakdown(skills, hoursPerWeek) {
+            let totalMonthlyIncome = 0;
+            const skillBreakdown = {};
+
+            skills.forEach(skill => {
+                if (INCOME_RATES[skill]) {
+                    const hourlyRate = INCOME_RATES[skill].rate_per_hour;
+                    const seasonalMultiplier = INCOME_RATES[skill].seasonal_multiplier;
+                    const monthlyIncome = hourlyRate * hoursPerWeek * 4.33 * seasonalMultiplier;
+                    
+                    totalMonthlyIncome += monthlyIncome;
+                    skillBreakdown[skill] = {
+                        monthly_income: monthlyIncome,
+                        hourly_rate: hourlyRate,
+                        seasonal_multiplier: seasonalMultiplier
+                    };
+                }
+            });
+
+            return { totalMonthlyIncome, skillBreakdown };
+        }
+
+        function generateIncomePlan() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const villageName = document.getElementById('villageName').value.trim();
+            const selectedSkills = getSelectedSkills();
+            const availableHours = parseInt(document.getElementById('availableHours').value);
+            const language = document.getElementById('language').value;
+
+            // Validation
+            if (!fullName || !villageName || selectedSkills.length === 0) {
+                showAlert('Please fill in all required fields: Name, Village, and at least one skill.', 'error');
+                return;
+            }
+
+            // Show loading
+            const resultsSection = document.getElementById('resultsSection');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsSection.classList.remove('hidden');
+            resultsSection.classList.add('show');
+            loadingSpinner.classList.remove('hidden');
+            resultsContent.classList.add('hidden');
+
+            // Simulate processing time
+            setTimeout(() => {
+                const { totalMonthlyIncome, skillBreakdown } = calculateIncomeBreakdown(selectedSkills, availableHours);
+                displayResults(fullName, villageName, selectedSkills, availableHours, language, totalMonthlyIncome, skillBreakdown);
+                
+                loadingSpinner.classList.add('hidden');
+                resultsContent.classList.remove('hidden');
+            }, 2000);
+        }
+
+        function displayResults(fullName, villageName, skills, availableHours, language, totalIncome, skillBreakdown) {
+            const resultsContent = document.getElementById('resultsContent');
+            
+            // Calculate hourly rate range
+            const hourlyRates = Object.values(skillBreakdown).map(data => data.hourly_rate);
+            const minRate = Math.min(...hourlyRates);
+            const maxRate = Math.max(...hourlyRates);
+
+            let html = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Income plan generated for ${fullName} from ${villageName}!
+                </div>
+
+                <h3>Income Potential Summary</h3>
+                <div class="income-summary">
+                    <div class="income-card">
+                        <h3>₹${Math.round(totalIncome).toLocaleString()}</h3>
+                        <p>Monthly Income Potential</p>
+                    </div>
+                    <div class="income-card">
+                        <h3>₹${minRate}-${maxRate}</h3>
+                        <p>Hourly Rate Range</p>
+                    </div>
+                    <div class="income-card">
+                        <h3>${skills.length}</h3>
+                        <p>Skills Selected</p>
+                    </div>
+                </div>
+
+                <h3>Skill-wise Income Breakdown</h3>
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Skill</th>
+                            <th>Monthly Income (₹)</th>
+                            <th>Hourly Rate (₹)</th>
+                            <th>Seasonal Boost</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            // Add skill breakdown rows
+            Object.entries(skillBreakdown).forEach(([skill, data]) => {
+                const seasonalBoost = ((data.seasonal_multiplier - 1) * 100).toFixed(0);
+                html += `
+                        <tr>
+                            <td>${skill}</td>
+                            <td>₹${Math.round(data.monthly_income).toLocaleString()}</td>
+                            <td>₹${data.hourly_rate}</td>
+                            <td>${seasonalBoost}%</td>
+                        </tr>`;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+
+                <h3>Best Seasons for Your Skills</h3>`;
+
+            // Add seasonal recommendations
+            skills.forEach(skill => {
+                if (SEASON_RECOMMENDATIONS[skill]) {
+                    html += `
+                <div class="skill-card">
+                    <strong>${skill}:</strong><br>
+                    ${SEASON_RECOMMENDATIONS[skill]}
+                </div>`;
+                }
+            });
+
+            html += `<h3>Required Setup & Resources</h3>`;
+
+            // Add setup requirements
+            skills.forEach(skill => {
+                if (SETUP_REQUIREMENTS[skill]) {
+                    html += `
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>Setup for ${skill}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="expandable-content">
+                        ${SETUP_REQUIREMENTS[skill]}
+                    </div>
+                </div>`;
+                }
+            });
+
+            html += `<h3>Recommended Training</h3>`;
+
+            // Add training recommendations
+            skills.forEach(skill => {
+                if (TRAINING_RECOMMENDATIONS[skill]) {
+                    html += `
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>Training for ${skill}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="expandable-content">
+                        ${TRAINING_RECOMMENDATIONS[skill]}
+                    </div>
+                </div>`;
+                }
+            });
+
+            // Add success story
+            const primarySkill = skills[0];
+            const successStory = getSuccessStory(fullName, villageName, primarySkill);
+            
+            html += `
+                <h3>Local Success Story</h3>
+                <div class="success-story">
+                    <i class="fas fa-star"></i> ${successStory}
+                </div>
+
+                <h3>Your Next Steps</h3>
+                <div class="info-card">
+                    <h4><i class="fas fa-list-ol"></i> Action Plan:</h4>
+                    <ol>
+                        <li><strong>Start Small:</strong> Begin with your strongest skill</li>
+                        <li><strong>Build Network:</strong> Connect with local customers and suppliers</li>
+                        <li><strong>Focus on Quality:</strong> Maintain high quality to build reputation</li>
+                        <li><strong>Expand Gradually:</strong> Add more skills as you establish yourself</li>
+                        <li><strong>Track Progress:</strong> Monitor your income and customer feedback</li>
+                    </ol>
+                </div>
+
+                <h3>Audio Summary</h3>
+                <div class="audio-container">
+                    <p><i class="fas fa-volume-up"></i> Audio summary in ${language}</p>
+                    <button class="btn btn-secondary" onclick="generateAudioSummary('${fullName}', '${villageName}', ${totalIncome}, '${primarySkill}', '${language}')">
+                        <i class="fas fa-play"></i> Generate Audio Summary
+                    </button>
+                    <div id="audioPlayer" class="hidden">
+                        <!-- Audio player will be inserted here -->
+                    </div>
+                </div>
+
+                <h3>Save Your Plan</h3>
+                <button class="btn btn-secondary" onclick="downloadPlan('${fullName}', '${villageName}', '${JSON.stringify(skills).replace(/"/g, '&quot;')}', ${availableHours}, ${totalIncome})">
+                    <i class="fas fa-download"></i> Download Detailed Plan (JSON)
+                </button>
+
+                <h3>Village Location Map</h3>
+                <div class="map-container" id="mapContainer">
+                    <div class="spinner" id="mapSpinner"></div>
+                </div>
+
+                <button class="btn" onclick="resetForm()">
+                    <i class="fas fa-refresh"></i> Generate New Plan
+                </button>`;
+
+            resultsContent.innerHTML = html;
+
+            // Initialize map
+            initializeMap(villageName, fullName, totalIncome, skills.length);
+        }
+
+        function toggleExpandable(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                content.classList.add('show');
+                icon.className = 'fas fa-chevron-up';
+            }
+        }
+
+        function getSuccessStory(name, village, primarySkill) {
+            const stories = {
+                "Home Food Preparation": `Sunita from ${village} started making pickles and papad at home. Within 6 months, she built a customer base of 40+ families and now earns Rs.8,000 monthly during festival seasons.`,
+                "Dairy Farming": `Ramesh from ${village} started with 2 cows and focused on clean milk production. He now supplies to 25 households daily and earns Rs.7,500 monthly consistently.`,
+                "Vegetable Farming": `Krishnan from ${village} converted his small plot to vegetable farming. He now supplies to the local market and earns Rs.12,000 during peak harvest seasons.`,
+                "Tailoring & Embroidery": `Meera from ${village} started tailoring from home. She now has regular customers for blouse stitching and earns Rs.6,000 monthly.`,
+                "Small Shop/Kirana Store": `The Patel family from ${village} opened a small grocery store. They now serve 50+ families daily and earn Rs.10,000 monthly.`,
+                "Fruit Vendor/Sales": `Raj from ${village} started selling seasonal fruits with a small cart. He now earns Rs.8,500 monthly during peak fruit seasons.`
+            };
+            
+            return stories[primarySkill] || `Many families in ${village} have successfully developed their local skills into sustainable income sources.`;
+        }
+
+        async function generateAudioSummary(fullName, villageName, totalIncome, primarySkill, language) {
+            const audioPlayer = document.getElementById('audioPlayer');
+            const generateButton = event.target;
+            
+            // Disable button and show loading
+            generateButton.disabled = true;
+            generateButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Audio...';
+            
+            try {
+                // Create summary text based on language
+                let summaryText = getSummaryText(fullName, villageName, totalIncome, primarySkill, language);
+                
+                // Map our languages to Murf API language codes
+                const murfLanguageMap = {
+                    "English": "en",
+                    "Hindi": "hi",
+                    "Tamil": "ta",
+                    "Telugu": "te",
+                    "Marathi": "mr",
+                    "Punjabi": "pa",
+                    "Gujarati": "gu",
+                    "Bengali": "bn",
+                    "Kannada": "kn",
+                    "Malayalam": "ml",
+                    "Odia": "or",
+                    "Assamese": "as",
+                    "Urdu": "ur",
+                    "Nepali": "ne"
+                };
+                
+                const languageCode = murfLanguageMap[language] || "en";
+                
+                // Call Murf AI API
+                const audioUrl = await generateMurfAudio(summaryText, languageCode, language);
+                
+                if (audioUrl) {
+                    audioPlayer.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> 
+                            Audio summary generated successfully in ${language}!
+                        </div>
+                        <audio controls style="width: 100%; margin-top: 1rem;">
+                            <source src="${audioUrl}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <strong>Summary Text (${language}):</strong><br>
+                            <em>${summaryText}</em>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Failed to generate audio');
+                }
+                
+            } catch (error) {
+                console.error('Audio generation error:', error);
+                audioPlayer.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Unable to generate audio at the moment. Please try again later.
+                    </div>
+                    <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <strong>Summary Text (${language}):</strong><br>
+                        <em>${getSummaryText(fullName, villageName, totalIncome, primarySkill, language)}</em>
+                    </div>
+                `;
+            } finally {
+                // Re-enable button
+                generateButton.disabled = false;
+                generateButton.innerHTML = '<i class="fas fa-play"></i> Generate Audio Summary';
+                audioPlayer.classList.remove('hidden');
+            }
+        }
+
+        async function generateMurfAudio(text, languageCode, languageName) {
+            const MURF_API_KEY = 'ap2_9eeab251-2ecd-4fb2-a0c1-282e8d138b48';
+            const MURF_API_URL = 'https://api.murf.ai/v1/speech/generate';
+            
+            // Voice selection based on language and gender for authenticity
+            const voiceSelection = {
+                "en": { voice: "en-IN-neural2-A", gender: "FEMALE" }, // Indian English
+                "hi": { voice: "hi-IN-neural2-A", gender: "FEMALE" }, // Hindi
+                "ta": { voice: "ta-IN-neural2-A", gender: "FEMALE" }, // Tamil
+                "te": { voice: "te-IN-neural2-A", gender: "FEMALE" }, // Telugu
+                "mr": { voice: "mr-IN-neural2-A", gender: "FEMALE" }, // Marathi
+                "pa": { voice: "pa-IN-neural2-A", gender: "FEMALE" }, // Punjabi
+                "gu": { voice: "gu-IN-neural2-A", gender: "FEMALE" }, // Gujarati
+                "bn": { voice: "bn-IN-neural2-A", gender: "FEMALE" }, // Bengali
+                "kn": { voice: "kn-IN-neural2-A", gender: "FEMALE" }, // Kannada
+                "ml": { voice: "ml-IN-neural2-A", gender: "FEMALE" }, // Malayalam
+                "or": { voice: "or-IN-neural2-A", gender: "FEMALE" }, // Odia
+                "as": { voice: "as-IN-neural2-A", gender: "FEMALE" }, // Assamese
+                "ur": { voice: "ur-IN-neural2-A", gender: "FEMALE" }, // Urdu
+                "ne": { voice: "ne-NP-neural2-A", gender: "FEMALE" }  // Nepali
+            };
+            
+            const selectedVoice = voiceSelection[languageCode] || voiceSelection["en"];
+            
+            try {
+                const requestBody = {
+                    voiceId: selectedVoice.voice,
+                    style: "conversational",
+                    text: text,
+                    format: "MP3",
+                    sampleRate: 24000,
+                    effect: {
+                        speed: 1.0,
+                        pitch: 1.0
+                    }
+                };
+
+                const response = await fetch(MURF_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${MURF_API_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Murf API error: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // The API should return either a direct audio URL or audio data
+                if (result.audioUrl) {
+                    return result.audioUrl;
+                } else if (result.audioContent) {
+                    // If base64 audio content is returned, create a blob URL
+                    const audioBlob = base64ToBlob(result.audioContent, 'audio/mpeg');
+                    return URL.createObjectURL(audioBlob);
+                } else {
+                    throw new Error('No audio URL or content received from Murf API');
+                }
+
+            } catch (error) {
+                console.error('Murf API Error:', error);
+                
+                // Fallback: Try alternative approach with different endpoint structure
+                try {
+                    return await generateMurfAudioFallback(text, languageCode);
+                } catch (fallbackError) {
+                    console.error('Fallback API Error:', fallbackError);
+                    return null;
+                }
+            }
+        }
+
+        async function generateMurfAudioFallback(text, languageCode) {
+            const MURF_API_KEY = 'ap2_9eeab251-2ecd-4fb2-a0c1-282e8d138b48';
+            
+            // Alternative endpoint structure - some APIs use different paths
+            const FALLBACK_URL = 'https://api.murf.ai/v1/tts/generate';
+            
+            const requestBody = {
+                text: text,
+                language: languageCode,
+                voice: "default",
+                speed: 1.0,
+                format: "mp3"
+            };
+
+            const response = await fetch(FALLBACK_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${MURF_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Fallback API error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.audioUrl || result.url || null;
+        }
+
+        function base64ToBlob(base64Data, contentType) {
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: contentType });
+        }
+
+        function getSummaryText(fullName, villageName, totalIncome, primarySkill, language) {
+            const summaries = {
+                "Hindi": `नमस्ते ${fullName} जी, ${villageName} से! आपके चुने गए कौशलों के आधार पर, आप peak season में लगभग ${Math.round(totalIncome)} रुपये प्रतिमाह कमा सकते हैं। छोटी शुरुआत करें और गुणवत्ता पर ध्यान दें।`,
+                "Tamil": `வணக்கம் ${fullName}, ${villageName} இருந்து! உங்கள் திறமைகள் அடிப்படையில், நீங்க peak season ல மாதா ${Math.round(totalIncome)} ரூபாய் சம்பாதிக்க முடியும். சிறுத துவக்கத்தில் துவங்கி கொஞ்ச கொஞ்சம் விரிவாக்கவும்।`,
+                "Telugu": `నమస్కారం ${fullName}, ${villageName} నుండి! మీ నైపుణ్యాలు బట్టి, మీరు peak season లో నెలకు ${Math.round(totalIncome)} రూపాయలు సంపాదించగలరు। చిన్న మొదలుతో మొదలెట్టండి।`,
+                "English": `Hello ${fullName} from ${villageName}! Based on your skills, you can earn approximately ₹${Math.round(totalIncome)} per month during peak seasons. Start small and focus on quality.`
+            };
+            
+            return summaries[language] || summaries["English"];
+        }
+
+        async function initializeMap(villageName, fullName, totalIncome, skillCount) {
+            const mapContainer = document.getElementById('mapContainer');
+            const mapSpinner = document.getElementById('mapSpinner');
+            
+            try {
+                // Get coordinates for the village
+                const coordinates = await getVillageCoordinates(villageName);
+                
+                // Remove spinner
+                mapSpinner.remove();
+                
+                // Create map
+                const map = L.map('mapContainer').setView([coordinates.lat, coordinates.lon], 12);
+                
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                // Add marker for the village
+                const marker = L.marker([coordinates.lat, coordinates.lon]).addTo(map)
+                    .bindPopup(`
+                        <div style="width: 200px;">
+                            <h4>${villageName}</h4>
+                            <p><strong>Location:</strong> ${coordinates.display_name}</p>
+                            <p><strong>Income Potential:</strong> ₹${Math.round(totalIncome).toLocaleString()}/month</p>
+                            <p><strong>Skills:</strong> ${skillCount} selected</p>
+                        </div>
+                    `);
+                
+                // Add circle to show service area
+                L.circle([coordinates.lat, coordinates.lon], {
+                    color: 'blue',
+                    fillColor: '#30f',
+                    fillOpacity: 0.1,
+                    radius: 5000
+                }).addTo(map).bindPopup("Service Area (5km radius)");
+                
+                // Add info below map
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'alert alert-info';
+                infoDiv.innerHTML = `
+                    <i class="fas fa-map-marker-alt"></i> Location: ${coordinates.display_name}<br>
+                    <strong>This map shows your village location and potential 5km service radius for your income activities.</strong>
+                `;
+                mapContainer.parentNode.insertBefore(infoDiv, mapContainer.nextSibling);
+                
+            } catch (error) {
+                mapSpinner.remove();
+                mapContainer.innerHTML = `
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Unable to load map for this location. Please check the village name spelling.<br>
+                        <small>Try using format: Village Name, District, State (e.g., Rampur, Bareilly, Uttar Pradesh)</small>
+                    </div>
+                `;
+            }
+        }
+
+        async function getVillageCoordinates(villageName) {
+            try {
+                const searchQuery = `${villageName}, India`;
+                const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=1&countrycodes=in`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    return {
+                        lat: parseFloat(data[0].lat),
+                        lon: parseFloat(data[0].lon),
+                        display_name: data[0].display_name
+                    };
+                } else {
+                    // Default to center of India if village not found
+                    return {
+                        lat: 20.5937,
+                        lon: 78.9629,
+                        display_name: `${villageName}, India (approximate location)`
+                    };
+                }
+            } catch (error) {
+                // Fallback coordinates (center of India)
+                return {
+                    lat: 20.5937,
+                    lon: 78.9629,
+                    display_name: `${villageName}, India (approximate location)`
+                };
+            }
+        }
+
+        function downloadPlan(fullName, villageName, skillsJson, availableHours, totalIncome) {
+            const skills = JSON.parse(skillsJson.replace(/&quot;/g, '"'));
+            const { totalMonthlyIncome, skillBreakdown } = calculateIncomeBreakdown(skills, availableHours);
+            
+            const planData = {
+                name: fullName,
+                village: villageName,
+                skills: skills,
+                hours_per_week: availableHours,
+                total_monthly_income: totalIncome,
+                skill_breakdown: skillBreakdown,
+                generated_date: new Date().toISOString(),
+                seasons: {},
+                setup_requirements: {},
+                training: {}
+            };
+            
+            // Add additional data
+            skills.forEach(skill => {
+                planData.seasons[skill] = SEASON_RECOMMENDATIONS[skill] || "Year-round";
+                planData.setup_requirements[skill] = SETUP_REQUIREMENTS[skill] || "Basic setup required";
+                planData.training[skill] = TRAINING_RECOMMENDATIONS[skill] || "Skill enhancement recommended";
+            });
+            
+            const dataStr = JSON.stringify(planData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `income_plan_${fullName}_${villageName}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function resetForm() {
+            // Reset form
+            document.getElementById('incomeForm').reset();
+            
+            // Uncheck all skills
+            document.querySelectorAll('#skillsContainer input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            // Reset slider
+            document.getElementById('availableHours').value = 25;
+            document.getElementById('hoursValue').textContent = '25';
+            document.getElementById('hoursDisplay').textContent = '25 hours/week';
+            
+            // Reset language to English
+            document.getElementById('language').value = 'English';
+            
+            // Hide results
+            document.getElementById('resultsSection').classList.remove('show');
+            document.getElementById('resultsSection').classList.add('hidden');
+            
+            // Remove any alerts
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>

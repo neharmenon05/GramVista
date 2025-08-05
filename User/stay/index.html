@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village Stay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .lang-btn.active, .lang-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .stays-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stay-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stay-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stay-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stay-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.3"/><circle cx="80" cy="40" r="1.5" fill="white" opacity="0.2"/><circle cx="40" cy="80" r="1" fill="white" opacity="0.4"/></svg>');
+        }
+
+        .stay-info {
+            padding: 1.5rem;
+        }
+
+        .stay-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .stay-location {
+            color: #666;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stay-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .booking-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stays-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    🌾 <span data-key="app-title">Village Stay</span>
+                </div>
+                <div class="language-selector">
+                    <button class="lang-btn active" onclick="changeLanguage('en')">English</button>
+                    <button class="lang-btn" onclick="changeLanguage('hi')">हिंदी</button>
+                    <button class="lang-btn" onclick="changeLanguage('te')">తెలుగు</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="hero">
+                <h1 data-key="hero-title">Experience Authentic Village Life</h1>
+                <p data-key="hero-subtitle">Book unique stays and cultural events in beautiful rural destinations</p>
+            </div>
+
+            <!-- Filter Section -->
+            <section class="section">
+                <h2 data-key="filter-title">Filter Stays</h2>
+                <div class="booking-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="locationFilter">Location:</label>
+                            <input type="text" id="locationFilter" placeholder="Enter location..." oninput="filterStays()">
+                        </div>
+                        <div class="form-group">
+                            <label for="minPrice">Min Price:</label>
+                            <input type="number" id="minPrice" placeholder="₹0" min="0" oninput="filterStays()">
+                        </div>
+                        <div class="form-group">
+                            <label for="maxPrice">Max Price:</label>
+                            <input type="number" id="maxPrice" placeholder="₹10000" min="0" oninput="filterStays()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="guestsFilter">Max Guests:</label>
+                            <select id="guestsFilter" onchange="filterStays()">
+                                <option value="">Any</option>
+                                <option value="1">1 Guest</option>
+                                <option value="2">2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                                <option value="5">5+ Guests</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="ladiesOnlyFilter" onchange="filterStays()">
+                                <span data-key="ladies-only">Ladies Only</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button type="button" class="btn" onclick="resetFilters()">
+                            <span data-key="reset-filters">Reset Filters</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Village Stays Section -->
+            <section class="section">
+                <h2 data-key="stays-title">Featured Village Stays</h2>
+                <div class="stays-grid" id="staysGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading stays...
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="success-message" id="successMessage">
+                <span data-key="booking-success">Booking confirmed! We'll contact you soon.</span>
+            </div>
+            <h2 data-key="booking-title">Book Your Stay</h2>
+            <form class="booking-form" onsubmit="submitBooking(event)">
+                <div class="form-group">
+                    <label data-key="property-label">Property:</label>
+                    <input type="text" id="propertyName" readonly>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label data-key="checkin-label">Check-in Date:</label>
+                        <input type="date" id="checkinDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-key="checkout-label">Check-out Date:</label>
+                        <input type="date" id="checkoutDate" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label data-key="guests-label">Guests:</label>
+                        <select id="guestCount" required>
+                            <option value="1">1 Guest</option>
+                            <option value="2">2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="5+">5+ Guests</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-key="price-label">Price per night:</label>
+                        <input type="text" id="pricePerNight" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="name-label">Full Name:</label>
+                    <input type="text" id="customerName" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="email-label">Email:</label>
+                    <input type="email" id="customerEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="phone-label">Phone Number:</label>
+                    <input type="tel" id="customerPhone" required>
+                </div>
+
+                <div class="form-group">
+                    <label data-key="requests-label">Special Requests:</label>
+                    <textarea id="specialRequests" rows="3" placeholder="Any special requirements or requests..."></textarea>
+                </div>
+
+                <button type="submit" class="btn" data-key="confirm-booking">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let translations = {};
+        let staysData = [];
+        let currentStay = null;
+
+        // Data loading functions
+        async function loadTranslations() {
+            try {
+                const response = await fetch('./data/translations.json');
+                translations = await response.json();
+            } catch (error) {
+                console.error('Error loading translations:', error);
+                // Fallback translations
+                translations = {
+                    en: {
+                        'app-title': 'Village Stay',
+                        'hero-title': 'Experience Authentic Village Life',
+                        'hero-subtitle': 'Book unique and cultural stays in beautiful rural destinations',
+                        'stays-title': 'Featured Village Stays',
+                        
+                        'per-night': '/night',
+                        'per-person': '/person',
+                        'booking-title': 'Book Your Stay',
+                        
+                        'booking-success': 'Booking confirmed! We\'ll contact you soon.',
+                        
+                    }
+                };
+            }
+        }
+
+        async function loadStays() {
+            try {
+                const response = await fetch('./data/stays.json');
+                const data = await response.json();
+                staysData = data.stays;
+                renderStays();
+            } catch (error) {
+                console.error('Error loading stays:', error);
+                // Fallback data
+                staysData = [
+                    {
+                        "id": 1,
+                        "name": "Riverside Cottage",
+                        "location": "Hampi, Karnataka",
+                        "price": 2500,
+                        "currency": "₹",
+                        "image": "🏡",
+                        "amenities": ["River View", "Traditional Decor", "Local Cuisine"],
+                        "description": "Experience riverside tranquility in this charming cottage"
+                    }
+                ];
+                renderStays();
+            }
+        }
+
+        function renderStays(staysToRender = staysData) {
+            const staysGrid = document.getElementById('staysGrid');
+            staysGrid.innerHTML = '';
+
+            if (staysToRender.length === 0) {
+                staysGrid.innerHTML = '<div class="loading">No stays found matching your criteria.</div>';
+                return;
+            }
+
+            staysToRender.forEach(stay => {
+                const stayCard = document.createElement('div');
+                stayCard.className = 'stay-card';
+                stayCard.onclick = () => openBookingModal(stay);
+
+                stayCard.innerHTML = `
+                    <div class="stay-image">
+                        ${stay.image ? stay.image : '🏠'} <span>${stay.name}</span>
+                    </div>
+                    <div class="stay-info">
+                        <div class="stay-title">${stay.name}</div>
+                        <div class="stay-location">📍 ${stay.location}</div>
+                        ${stay.ladiesOnly ? `<div style="color: #e91e63; font-weight: bold; margin: 5px 0;">👩 Ladies Only</div>` : ''}
+                        <div class="stay-description">
+                            ${stay.description}
+                        </div>
+                        <div class="stay-amenities">
+                            <strong>Amenities:</strong> ${stay.amenities.join(', ')}
+                        </div>
+                        <div class="stay-price">${stay.currency}${stay.price} <span data-key="per-night">/night</span></div>
+                    </div>
+                `;
+
+                staysGrid.appendChild(stayCard);
+            });
+        }
+
+        function filterStays() {
+            const locationFilter = document.getElementById('locationFilter').value.toLowerCase();
+            const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
+            const maxPrice = parseInt(document.getElementById('maxPrice').value) || Infinity;
+            const guestsFilter = document.getElementById('guestsFilter').value;
+            const ladiesOnlyFilter = document.getElementById('ladiesOnlyFilter').checked;
+
+            const filteredStays = staysData.filter(stay => {
+                const matchesLocation = !locationFilter || stay.location.toLowerCase().includes(locationFilter);
+                const matchesPrice = stay.price >= minPrice && stay.price <= maxPrice;
+                const matchesGuests = !guestsFilter || stay.maxGuests >= parseInt(guestsFilter);
+                const matchesLadiesOnly = !ladiesOnlyFilter || stay.ladiesOnly;
+
+                return matchesLocation && matchesPrice && matchesGuests && matchesLadiesOnly;
+            });
+
+            renderStays(filteredStays);
+        }
+
+        function resetFilters() {
+            document.getElementById("locationFilter").value = "";
+            document.getElementById("minPrice").value = "";
+            document.getElementById("maxPrice").value = "";
+            document.getElementById("guestsFilter").value = "";
+            document.getElementById("ladiesOnlyFilter").checked = false;
+            renderStays(staysData);
+        }
+
+
+
+        // Modal functions
+        function openBookingModal(stay) {
+            currentStay = stay;
+            document.getElementById('propertyName').value = stay.name;
+            document.getElementById('pricePerNight').value = `${stay.currency}${stay.price}`;
+            document.getElementById('bookingModal').style.display = 'block';
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkinDate').min = today;
+            document.getElementById('checkoutDate').min = today;
+        }
+
+
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Form submission functions
+        async function submitBooking(event) {
+            event.preventDefault();
+            
+            const bookingData = {
+                stayId: currentStay.id,
+                propertyName: document.getElementById('propertyName').value,
+                checkinDate: document.getElementById('checkinDate').value,
+                checkoutDate: document.getElementById('checkoutDate').value,
+                guests: document.getElementById('guestCount').value,
+                customerName: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                specialRequests: document.getElementById('specialRequests').value,
+                pricePerNight: currentStay.price,
+                totalPrice: calculateStayTotal(),
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                // In a real app, this would send to your backend
+                await saveBooking(bookingData, 'stay');
+                
+                document.getElementById('successMessage').style.display = 'block';
+                event.target.reset();
+                
+                setTimeout(() => {
+                    closeModal();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error saving booking:', error);
+                alert('Error processing booking. Please try again.');
+            }
+        }
+
+
+        // Helper functions
+        function calculateStayTotal() {
+            const checkin = new Date(document.getElementById('checkinDate').value);
+            const checkout = new Date(document.getElementById('checkoutDate').value);
+            const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+            return nights * currentStay.price;
+        }
+
+        
+
+        async function saveBooking(bookingData, type) {
+            
+            console.log(`${type} booking saved:`, bookingData);
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Save to localStorage for demo purposes
+            const existingBookings = JSON.parse(localStorage.getItem('villageBookings') || '{"stays": [], "events": []}');
+            
+            if (type === 'stay') {
+                existingBookings.stays.push(bookingData);
+            }             
+            localStorage.setItem('villageBookings', JSON.stringify(existingBookings));
+            
+            return { success: true, bookingId: Date.now() };
+        }
+
+        // Language functions
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update all translatable elements
+            updateTranslations();
+        }
+
+        function updateTranslations() {
+            if (!translations[currentLanguage]) return;
+            
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        // Date validation
+        function setupDateValidation() {
+            const checkinInput = document.getElementById('checkinDate');
+            const checkoutInput = document.getElementById('checkoutDate');
+            
+            checkinInput.addEventListener('change', function() {
+                const checkinDate = new Date(this.value);
+                const minCheckout = new Date(checkinDate);
+                minCheckout.setDate(minCheckout.getDate() + 1);
+                
+                checkoutInput.min = minCheckout.toISOString().split('T')[0];
+                
+                if (checkoutInput.value && new Date(checkoutInput.value) <= checkinDate) {
+                    checkoutInput.value = minCheckout.toISOString().split('T')[0];
+                }
+            });
+        }
+
+        // Modal event listeners
+        function setupModalEventListeners() {
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                const bookingModal = document.getElementById('bookingModal');
+                
+                if (event.target === bookingModal) {
+                    closeModal();
+                }
+            });
+
+            // Close modals with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+
+        // Initialize the application
+        async function initApp() {
+            try {
+                // Show loading state
+                console.log('Initializing Village Stay...');
+                
+                // Load all data
+                await Promise.all([
+                    loadTranslations(),
+                    loadStays(),
+                ]);
+                
+                // Setup event listeners
+                setupDateValidation();
+                setupModalEventListeners();
+                
+                // Update translations for current language
+                updateTranslations();
+                
+                console.log('App initialized successfully!');
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                
+                // Show error message to user
+                const errorMessage = document.createElement('div');
+                errorMessage.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #f44336;
+                    color: white;
+                    padding: 1rem;
+                    border-radius: 10px;
+                    z-index: 9999;
+                `;
+                errorMessage.textContent = 'Error loading app data. Please refresh the page.';
+                document.body.appendChild(errorMessage);
+                
+                setTimeout(() => errorMessage.remove(), 5000);
+            }
+        }
+
+        // Start the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Service Worker for offline functionality (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Export functions for testing (in a real app, you might not need this)
+        window.VillageStayApp = {
+            changeLanguage,
+            openBookingModal,
+            closeModal,
+            submitBooking,
+        };
+    </script>
+</body>
+</html>

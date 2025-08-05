@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Language Helper</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .speak-btn {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .progress-bar {
+            height: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .quiz-option.correct {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #F44336 !important;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8" id="app">
+        <!-- State Selection Screen (Default Screen) -->
+        <div id="state-selection" class="text-center">
+<div class="mb-10">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Language_region_maps_of_India.svg/1200px-Language_region_maps_of_India.svg.png" 
+         alt="Colorful illustration of India map with pins marking Delhi, Tamil Nadu, Kerala, and Andhra Pradesh" 
+         class="mx-auto rounded-lg shadow-lg w-1/2" />
+</div>
+
+            <h1 class="text-4xl font-bold text-indigo-800 mb-6">Welcome to Travel Language Helper!</h1>
+            <p class="text-lg text-gray-700 mb-10">Select your destination state to begin learning essential phrases for your trip.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="selectState('Delhi')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/b7b319ee-ab7d-4436-8ddf-46467def8f68.png" alt="Icon of India Gate monument in Delhi with warm orange sunset colors" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Delhi</h3>
+                        <p class="text-gray-600">Learn common Hindi phrases</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="selectState('Tamil Nadu')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a5d27026-16b2-4d26-a1f2-d1ab0b442a77.png" alt="Icon of Meenakshi Temple in Tamil Nadu with vibrant blue sky and intricate temple details" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Tamil Nadu</h3>
+                        <p class="text-gray-600">Learn common Tamil phrases</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="selectState('Kerala')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/aa3507f1-421a-4cb5-8ee4-cd0fc719bfeb.png" alt="Icon of Kerala backwaters with green palm trees and a traditional houseboat on blue water" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Kerala</h3>
+                        <p class="text-gray-600">Learn common Malayalam phrases</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="selectState('Andhra')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/2480c446-8690-440f-bdbf-f7a1fcf9aa4b.png" alt="Icon of Charminar monument in Andhra Pradesh bathed in golden light against a dusk sky" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Andhra Pradesh</h3>
+                        <p class="text-gray-600">Learn common Telugu phrases</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-10">
+    <button onclick="showTranslator()" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700">
+        Try Language Translator
+    </button>
+</div>
+
+        <!-- Language Welcome Screen -->
+        <div id="language-screen" class="hidden text-center">
+            <div class="mb-10">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/041c10d1-6599-4d54-93bc-e3fe3a99ed86.png" alt="Happy diverse group of people learning languages together in a bright classroom" class="mx-auto rounded-lg shadow-lg" id="language-image" />
+            </div>
+            <h1 class="text-4xl font-bold text-indigo-800 mb-6" id="language-title">Ready to learn Tamil!</h1>
+            <p class="text-lg text-gray-700 mb-10">Select a category to start learning common phrases</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto" id="category-container">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+            
+            <button onclick="backToStates()" class="mt-10 px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">Back to States</button>
+        </div>
+        
+        <!-- Phrases Screen -->
+        <div id="phrases-screen" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-indigo-800" id="category-title"></h2>
+                <button onclick="backToCategories()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">Back to Categories</button>
+            </div>
+            
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-700">Learning Progress</span>
+                    <span class="text-sm font-medium text-gray-700" id="progress-text">0/15</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-indigo-600 h-2.5 rounded-full progress-bar" id="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="phrases-container">
+                    <!-- Phrases will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="startQuiz()" class="px-8 py-3 bg-green-600 text-white rounded-lg font-bold text-lg hover:bg-green-700 shadow-lg">Ready to Test Your Knowledge!</button>
+            </div>
+        </div>
+        
+        <!-- Quiz Selection Screen -->
+        <div id="quiz-selection" class="hidden text-center">
+            <div class="mb-10">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a132db8b-2073-45ae-bbe6-29ab9ee17cad.png" alt="Illustration of a quiz show with a happy host, microphone, and multiple choice options in bright colors" class="mx-auto rounded-lg shadow-lg" />
+            </div>
+            <h1 class="text-4xl font-bold text-indigo-800 mb-6">Test Your Knowledge</h1>
+            <p class="text-lg text-gray-700 mb-10">Select a quiz type to practice what you've learned</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="startSpecificQuiz('matching')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/68a4ffeb-b0fb-4461-bb34-30c3e10238bf.png" alt="Icon of matching pairs game with colorful cards showing language phrases" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Matching Game</h3>
+                        <p class="text-gray-600">Match phrases to their translations</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="startSpecificQuiz('fill')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/1cc60892-a1d0-4710-b1fc-8c6d30c0da1e.png" alt="Icon of Choose The Correct Answer exercise with pencil writing in missing word" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Choose The Correct Answer</h3>
+                        <p class="text-gray-600">Complete the phrase with missing words</p>
+                    </div>
+                </div>
+                
+                <div class="card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50" onclick="startSpecificQuiz('listening')">
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e9669a12-e045-4630-8dc6-660f70569d6f.png" alt="Icon of headphones with sound waves indicating listening comprehension exercise" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Listening Test</h3>
+                        <p class="text-gray-600">Identify phrases you hear</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="backToPhrases()" class="mt-10 px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">Back to Phrases</button>
+        </div>
+        
+        <!-- Quiz Screens -->
+        <div id="quiz-matching" class="hidden quiz-screen">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-indigo-800">Matching Game</h2>
+                <div>
+                    <span class="text-lg font-bold mr-4" id="quiz-score">Score: 0/0</span>
+                    <button onclick="endQuiz()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">End Quiz</button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <p class="text-xl font-medium mb-6 text-center" id="match-instruction">Match each phrase with its correct translation</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div id="match-original" class="space-y-4">
+                        <!-- Original phrases will be added here -->
+                    </div>
+                    <div id="match-translation" class="space-y-4">
+                        <!-- Translations will be added here -->
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button onclick="checkMatching()" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold text-lg hover:bg-indigo-700 shadow-lg">Check Answers</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="quiz-fill" class="hidden quiz-screen">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-indigo-800">Choose The Correct Answer</h2>
+                <div>
+                    <span class="text-lg font-bold mr-4" id="fill-score">Score: 0/0</span>
+                    <button onclick="endQuiz()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">End Quiz</button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8" id="fill-container">
+                <!-- Questions will be added here -->
+            </div>
+        </div>
+        
+        <div id="quiz-listening" class="hidden quiz-screen">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-indigo-800">Listening Test</h2>
+                <div>
+                    <span class="text-lg font-bold mr-4" id="listen-score">Score: 0/0</span>
+                    <button onclick="endQuiz()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">End Quiz</button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <div class="flex justify-center mb-8">
+                    <button onclick="playListeningQuestion()" class="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg font-bold text-lg hover:bg-indigo-700 shadow-lg speak-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 010-7.072m12.728 0l-5.657 5.657M5.586 15.536L11.243 9.88" />
+                        </svg>
+                        Play Question
+                    </button>
+                </div>
+                
+                <p class="text-xl font-medium mb-6 text-center">What did you hear? Select the correct translation:</p>
+                
+                <div class="space-y-3" id="listen-options">
+                    <!-- Options will be added here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quiz Results Screen -->
+        <div id="quiz-results" class="hidden text-center">
+            <div class="mb-10">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/65c0fc67-2f74-4244-81da-50a7336f642f.png" alt="Celebration illustration with confetti, trophy, and happy face showing quiz completion" class="mx-auto rounded-lg shadow-lg" />
+            </div>
+            <h1 class="text-4xl font-bold text-indigo-800 mb-6" id="results-title">Quiz Complete!</h1>
+            <p class="text-lg text-gray-700 mb-6" id="results-score">You scored 15 out of 15!</p>
+            <p class="text-lg text-gray-700 mb-10" id="results-message">Excellent work! You're ready for your trip!</p>
+            
+            <div class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <button onclick="practiceAgain()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-bold text-lg hover:bg-indigo-700 shadow-lg">Practice Again</button>
+                <button onclick="backToPhrases()" class="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-bold text-lg hover:bg-gray-400">Back to Phrases</button>
+            </div>
+        </div>
+    </div>
+<!-- Translator Tool (Bidirectional with voice support) -->
+<div id="translator-tool" class="hidden text-center">
+    <h2 class="text-3xl font-bold text-indigo-800 mb-4">AI-Powered Language Translator</h2>
+    <p class="text-lg text-gray-700 mb-6">Speak or type to translate between Indian languages</p>
+
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block font-semibold mb-1">Input Language</label>
+                <select id="input-lang" class="w-full p-3 border rounded-lg">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="ml">Malayalam</option>
+                    <option value="te">Telugu</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-1">Output Language</label>
+                <select id="output-lang" class="w-full p-3 border rounded-lg">
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="ml">Malayalam</option>
+                    <option value="te">Telugu</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <input id="translate-input" type="text" class="flex-1 p-3 border rounded-lg" placeholder="Speak or type something..." />
+            <button onclick="startVoiceInput()" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">🎤</button>
+        </div>
+
+        <button onclick="translateAndSpeak()" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700">Translate & Speak</button>
+
+        <div id="translation-output" class="text-xl text-indigo-700 font-medium mt-4"></div>
+    </div>
+
+    <button onclick="backToStates()" class="mt-10 px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400">Back to Home</button>
+</div>
+
+    <script>
+        // State and language data
+        const stateData = {
+            'Delhi': {
+                language: 'Hindi',
+                image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGZ8B72Km1aWXby8vhdEzIFUrNf6hs99s9gD1tVKY0hGcM20eSm7c9TDNLfgPDdjPKVJA17TNcQ9zWsqTSmyM0wKSFFSG8vNGjCIQbtz7Gbf6bAJHC-MCA4R0PgqMXnTgn512uzZQ963ifoAX_4lbLCDc36lxe8XSfC9-uSLXV5lEkbHgJrXeE7yLAHA/s629/hindii.jpg',
+                categories: {
+                    'Basic': {
+    phrases: [
+        {english: 'Hello', local: 'नमस्ते', id: 'h1'},
+        {english: 'Thank you', local: 'धन्यवाद', id: 'h2'},
+        {english: 'Yes', local: 'हाँ', id: 'h3'},
+        {english: 'No', local: 'नहीं', id: 'h4'},
+        {english: 'Please', local: 'कृपया', id: 'h5'},
+        {english: 'Excuse me', local: 'माफ़ कीजिए', id: 'h6'},
+        {english: 'I don\'t understand', local: 'मैं नहीं समझा', id: 'h7'},
+        {english: 'How much does this cost?', local: 'यह कितने का है?', id: 'h8'},
+        {english: 'Where is the restroom?', local: 'शौचालय कहाँ है?', id: 'h9'},
+        {english: 'Goodbye', local: 'अलविदा', id: 'h10'},
+        {english: 'Good morning', local: 'सुप्रभात', id: 'h11'},
+        {english: 'Good night', local: 'शुभ रात्रि', id: 'h12'},
+        {english: 'What is your name?', local: 'आपका नाम क्या है?', id: 'h13'},
+        {english: 'My name is...', local: 'मेरा नाम ... है', id: 'h14'},
+        {english: 'Nice to meet you', local: 'आपसे मिलकर अच्छा लगा', id: 'h15'},
+        {english: 'How are you?', local: 'आप कैसे हैं?', id: 'h16'},
+        {english: 'I am fine', local: 'मैं ठीक हूँ', id: 'h17'},
+        {english: 'Can you help me?', local: 'क्या आप मेरी मदद कर सकते हैं?', id: 'h18'},
+        {english: 'Sorry', local: 'माफ़ कीजिए', id: 'h19'},
+        {english: 'Welcome', local: 'स्वागत है', id: 'h20'}
+    ]
+},
+
+'Shopping': {
+    phrases: [
+        {english: 'How much does this cost?', local: 'यह कितने का है?', id: 'h21'},
+        {english: 'That\'s too expensive', local: 'यह बहुत महंगा है', id: 'h22'},
+        {english: 'Do you have this in another size?', local: 'क्या यह दूसरे आकार में उपलब्ध है?', id: 'h23'},
+        {english: 'Can you give me a discount?', local: 'क्या आप मुझे छूट दे सकते हैं?', id: 'h24'},
+        {english: 'I\'m just looking', local: 'मैं बस देख रहा हूँ', id: 'h25'},
+        {english: 'Do you accept cards?', local: 'क्या आप कार्ड स्वीकार करते हैं?', id: 'h26'},
+        {english: 'Can I try this on?', local: 'क्या मैं इसे पहन कर देख सकता हूँ?', id: 'h27'},
+        {english: 'I will take this', local: 'मैं यह लूंगा', id: 'h28'},
+        {english: 'Is it available in another color?', local: 'क्या यह किसी और रंग में है?', id: 'h29'},
+        {english: 'Where is the billing counter?', local: 'बिलिंग काउंटर कहाँ है?', id: 'h30'},
+        {english: 'Do you deliver?', local: 'क्या आप होम डिलीवरी करते हैं?', id: 'h31'},
+        {english: 'Can I return this?', local: 'क्या मैं इसे वापस कर सकता हूँ?', id: 'h32'},
+        {english: 'Are there any offers?', local: 'कोई ऑफर है क्या?', id: 'h33'},
+        {english: 'This is too small', local: 'यह बहुत छोटा है', id: 'h34'},
+        {english: 'This is too big', local: 'यह बहुत बड़ा है', id: 'h35'}
+    ]
+},
+
+'Transportation': {
+    phrases: [
+        {english: 'Where is the metro station?', local: 'मेट्रो स्टेशन कहाँ है?', id: 'h36'},
+        {english: 'How much is a ticket?', local: 'टिकट कितने का है?', id: 'h37'},
+        {english: 'Does this bus go to...?', local: 'क्या यह बस ... जाती है?', id: 'h38'},
+        {english: 'Where can I get a taxi?', local: 'मुझे टैक्सी कहाँ मिल सकती है?', id: 'h39'},
+        {english: 'Please stop here', local: 'कृपया यहाँ रुकिए', id: 'h40'},
+        {english: 'Where is the railway station?', local: 'रेलवे स्टेशन कहाँ है?', id: 'h41'},
+        {english: 'How long will it take?', local: 'कितना समय लगेगा?', id: 'h42'},
+        {english: 'I want to go to the airport', local: 'मुझे हवाई अड्डे जाना है', id: 'h43'},
+        {english: 'Is this seat taken?', local: 'क्या यह सीट खाली है?', id: 'h44'},
+        {english: 'When is the next bus?', local: 'अगली बस कब है?', id: 'h45'},
+        {english: 'Is this the right platform?', local: 'क्या यह सही प्लेटफ़ॉर्म है?', id: 'h46'},
+        {english: 'How far is it?', local: 'यह कितनी दूर है?', id: 'h47'},
+        {english: 'I missed my bus', local: 'मेरी बस छूट गई', id: 'h48'},
+        {english: 'Is there a direct bus?', local: 'क्या सीधे जाने वाली बस है?', id: 'h49'},
+        {english: 'Can I get a bus to the city center?', local: 'क्या मुझे सिटी सेंटर के लिए बस मिलेगी?', id: 'h50'}
+    ]
+},
+
+'Medical': {
+    phrases: [
+        {english: 'I need a doctor', local: 'मुझे डॉक्टर चाहिए', id: 'h51'},
+        {english: 'Where is the hospital?', local: 'अस्पताल कहाँ है?', id: 'h52'},
+        {english: 'I have a fever', local: 'मुझे बुखार है', id: 'h53'},
+        {english: 'It hurts here', local: 'यहाँ दर्द हो रहा है', id: 'h54'},
+        {english: 'I\'m allergic to...', local: 'मुझे ... से एलर्जी है', id: 'h55'},
+        {english: 'I need medicine', local: 'मुझे दवाई चाहिए', id: 'h56'},
+        {english: 'Is there a pharmacy nearby?', local: 'क्या पास में कोई मेडिकल स्टोर है?', id: 'h57'},
+        {english: 'Call an ambulance', local: 'एम्बुलेंस बुलाइए', id: 'h58'},
+        {english: 'I feel dizzy', local: 'मुझे चक्कर आ रहे हैं', id: 'h59'},
+        {english: 'I have a headache', local: 'मुझे सिरदर्द है', id: 'h60'}
+    ]
+}
+
+                }
+            },
+            'Tamil Nadu': {
+                language: 'Tamil',
+                image: 'https://i.pinimg.com/736x/23/26/5f/23265f7333a01fbc1806f3beae7037fc.jpg',
+                categories: {
+                    'Basic': {
+                        phrases: [
+                            {english: 'Hello', local: 'வணக்கம்', id: 't1'},
+                            {english: 'Thank you', local: 'நன்றி', id: 't2'},
+                            {english: 'Yes', local: 'ஆம்', id: 't3'},
+                            {english: 'No', local: 'இல்லை', id: 't4'},
+                            {english: 'Please', local: 'தயவு செய்து', id: 't5'},
+                            {english: 'Excuse me', local: 'மன்னிக்கவும்', id: 't6'},
+                            {english: 'I don\'t understand', local: 'எனக்கு புரியவில்லை', id: 't7'},
+                            {english: 'How much does this cost?', local: 'இது எவ்வளவு?', id: 't8'},
+                            {english: 'Where is the restroom?', local: 'கழிவறை எங்கே?', id: 't9'},
+                            {english: 'Goodbye', local: 'விடைபெறுகிறேன்', id: 't10'},
+                            {english: 'Good morning', local: 'காலை வணக்கம்', id: 't11'},
+                            {english: 'Good night', local: 'இரவு வணக்கம்', id: 't12'},
+                            {english: 'What is your name?', local: 'உங்கள் பெயர் என்ன?', id: 't13'},
+                            {english: 'I need help', local: 'எனக்கு உதவி தேவை', id: 't14'},
+                            {english: 'I am hungry', local: 'எனக்கு பசிக்கிறது', id: 't15'}
+                        ]
+                    },
+                    'Shopping': {
+                        phrases: [
+                            {english: 'I\'m just looking', local: 'நான் பார்த்துக்கொண்டிருக்கிறேன்', id: 't16'},
+                            {english: 'Do you accept credit cards?', local: 'நீங்கள் கிரெடிட் கார்டு ஏற்கிறீர்களா?', id: 't17'},
+                            {english: 'Can I try this on?', local: 'இதை நான் அணிந்து பார்வையிடலாமா?', id: 't18'},
+                            {english: 'I will buy this', local: 'இதை வாங்குகிறேன்', id: 't19'},
+                            {english: 'Do you have this in another color?', local: 'இது வேறு நிறத்தில் உள்ளதா?', id: 't20'},
+                            {english: 'Where is the billing counter?', local: 'பில்லிங் கவுன்டர் எங்கு உள்ளது?', id: 't21'},
+                            {english: 'Is this made locally?', local: 'இது உள்ளூரில் தயாரிக்கப்பட்டதா?', id: 't22'},
+                            {english: 'Can I return this if needed?', local: 'தேவைப்பட்டால் இதை திருப்பிக்கொடுக்கலாமா?', id: 't23'},
+                            {english: 'Do you deliver?', local: 'நீங்கள் டெலிவரி செய்வீர்களா?', id: 't24'},
+                            {english: 'It’s too small for me', local: 'இது எனக்கு சிறியது', id: 't25'},
+                            {english: 'It’s too big for me', local: 'இது எனக்கு பெரியது', id: 't26'},
+                            {english: 'How much does this cost?', local: 'இது எவ்வளவு?', id: 't27'},
+                            {english: 'That\'s too expensive', local: 'இது மிகவும் விலை உயர்ந்தது', id: 't28'},
+                            {english: 'Do you have this in another size?', local: 'இது வேறு அளவில் உள்ளதா?', id: 't29'},
+                            {english: 'Can you give me a discount?', local: 'தள்ளுபடி தர முடியுமா?', id: 't30'},
+
+                        ]
+                    },
+                    'Transportation': {
+                        phrases: [
+                                {english: 'Where is the railway station?', local: 'ரயில்வே நிலையம் எங்கே?', id: 't31'},
+                                {english: 'When is the next train?', local: 'அடுத்த ரயில் எப்போது?', id: 't32'},
+        {english: 'How long will it take to reach?', local: 'அங்கே செல்வதற்கு எவ்வளவு நேரமாகும்?', id: 't33'},
+        {english: 'Is this seat taken?', local: 'இந்த இடம் ஏற்கனவே பிடிக்கப்பட்டதா?', id: 't34'},
+        {english: 'I want to go to the airport', local: 'நான் விமான நிலையத்திற்கு செல்ல வேண்டும்', id: 't35'},
+        {english: 'Is this the right platform?', local: 'இது சரியான மேடைதானா?', id: 't36'},
+        {english: 'Can I get a bus to the city center?', local: 'நகர மையத்திற்கு பஸ் கிடைக்குமா?', id: 't37'},
+        {english: 'How far is it from here?', local: 'இங்கிருந்து எவ்வளவு தூரம்?', id: 't38'},
+        {english: 'I missed my bus', local: 'என் பஸ் தவறிவிட்டது', id: 't39'},
+        {english: 'Is it a direct route?', local: 'இது நேரடி வழித்தடமா?', id: 't40'},
+                            {english: 'Where is the bus stand?', local: 'பஸ் நிலையம் எங்கே?', id: 't41'},
+                            {english: 'How much is a ticket?', local: 'டிக்கெட் எவ்வளவு?', id: 't42'},
+                            {english: 'Does this bus go to...?', local: 'இந்த பஸ் ... செல்கிறதா?', id: 't43'},
+                            {english: 'Where can I get a taxi?', local: 'டாக்ஸி எங்கே கிடைக்கும்?', id: 't44'},
+                            {english: 'Please stop here', local: 'தயவு செய்து இங்கே நிறுத்தவும்', id: 't45'}
+                        ]
+                    },
+                    'Medical': {
+                        phrases: [
+                            {english: 'I need medicine', local: 'எனக்கு மருந்து தேவை', id: 't46'},
+        {english: 'Is there a pharmacy nearby?', local: 'அருகில் மருந்தகம் உள்ளதா?', id: 't47'},
+        {english: 'I feel dizzy', local: 'எனக்கு தலைசுற்றுகிறது', id: 't48'},
+        {english: 'Call an ambulance', local: 'ஒரு ஆம்புலன்ஸ் அழைக்கவும்', id: 't49'},
+        {english: 'I have a stomach ache', local: 'எனக்கு வயிறு வலி உள்ளது', id: 't50'},
+        {english: 'I have a headache', local: 'எனக்கு தலைவலி உள்ளது', id: 't51'},
+        {english: 'I need first aid', local: 'எனக்கு முதன்மை மருத்துவ சேவை தேவை', id: 't52'},
+        {english: 'Can you help me?', local: 'நீங்கள் எனக்கு உதவ முடியுமா?', id: 't53'},
+        {english: 'Is it serious?', local: 'இது மோசமானதா?', id: 't54'},
+        {english: 'Where is the nearest clinic?', local: 'அருகிலுள்ள கிளினிக் எங்கு உள்ளது?', id: 't55'},
+
+                            {english: 'I need a doctor', local: 'எனக்கு ஒரு டாக்டர் தேவை', id: 't56'},
+                            {english: 'Where is the hospital?', local: 'மருத்துவமனை எங்கே?', id: 't57'},
+                            {english: 'I have a fever', local: 'எனக்கு காய்ச்சல் இருக்கிறது', id: 't58'},
+                            {english: 'It hurts here', local: 'இங்கே வலிக்கிறது', id: 't59'},
+                            {english: 'I\'m allergic to...', local: 'எனக்கு ... அலர்ஜி உள்ளது', id: 't60'}
+                        ]
+                    }
+                }
+            },
+            'Kerala': {
+                language: 'Malayalam',
+                image: 'https://storage.googleapis.com/stateless-www-justwravel-com/2024/11/b062cce8-top-10-1024x576.jpg',
+                categories: {
+                    'Basic': {
+    phrases: [
+        {english: 'Hello', local: 'നമസ്കാരം', id: 'm1'},
+        {english: 'Thank you', local: 'നന്ദി', id: 'm2'},
+        {english: 'Yes', local: 'അതെ', id: 'm3'},
+        {english: 'No', local: 'ഇല്ല', id: 'm4'},
+        {english: 'Please', local: 'ദയവായി', id: 'm5'},
+        {english: 'Excuse me', local: 'മാപ്പിനായി', id: 'm6'},
+        {english: 'I don\'t understand', local: 'എനിക്ക് മനസ്സിലാകുന്നില്ല', id: 'm7'},
+        {english: 'How much does this cost?', local: 'ഇതിന് എത്ര വില?', id: 'm8'},
+        {english: 'Where is the restroom?', local: 'ടോയ്ലറ്റ് എവിടെയാണ്?', id: 'm9'},
+        {english: 'Goodbye', local: 'വിട', id: 'm10'},
+        {english: 'Good morning', local: 'സുപ്രഭാതം', id: 'm11'},
+        {english: 'Good night', local: 'ശുഭ രാത്രി', id: 'm12'},
+        {english: 'What is your name?', local: 'നിന്റെ പേര് എന്താണ്?', id: 'm13'},
+        {english: 'My name is...', local: 'എന്റെ പേര്...', id: 'm14'},
+        {english: 'Nice to meet you', local: 'നിനക്കൊപ്പം കണ്ടുമുട്ടിയത് സന്തോഷം', id: 'm15'},
+        {english: 'How are you?', local: 'സുഖമാണോ?', id: 'm16'},
+        {english: 'I am fine', local: 'എനിക്ക് സുഖമാണ്', id: 'm17'},
+        {english: 'Can you help me?', local: 'നിങ്ങൾക്ക് എനിക്ക് സഹായിക്കാമോ?', id: 'm18'},
+        {english: 'Sorry', local: 'ക്ഷമിക്കണം', id: 'm19'},
+        {english: 'Welcome', local: 'സ്വാഗതം', id: 'm20'}
+    ]
+},
+
+'Shopping': {
+    phrases: [
+        {english: 'How much does this cost?', local: 'ഇതിന് എത്ര വില?', id: 'm21'},
+        {english: 'That\'s too expensive', local: 'ഇത് വളരെ ചെലവേറിയതാണ്', id: 'm22'},
+        {english: 'Do you have this in another size?', local: 'ഇത് മറ്റൊരു സൈസിൽ ഉണ്ടോ?', id: 'm23'},
+        {english: 'Can you give me a discount?', local: 'നിങ്ങൾക്ക് എനിക്ക് ഒരു ഡിസ്കൗണ്ട് നൽകാമോ?', id: 'm24'},
+        {english: 'I\'m just looking', local: 'ഞാൻ നോക്കുകയാണ്', id: 'm25'},
+        {english: 'Do you accept card payments?', local: 'നിങ്ങൾ കാർഡ് പേയ്മെന്റ് സ്വീകരിക്കുന്നുണ്ടോ?', id: 'm26'},
+        {english: 'Can I try this on?', local: 'ഇത് ഞാൻ പരീക്ഷിച്ചോ?', id: 'm27'},
+        {english: 'I will take this', local: 'ഇത് ഞാൻ എടുക്കും', id: 'm28'},
+        {english: 'Is this locally made?', local: 'ഇത് ഇവിടത്തെതാണോ?', id: 'm29'},
+        {english: 'Where is the billing counter?', local: 'ബില്ലിങ് കൗണ്ടർ എവിടെയാണ്?', id: 'm30'},
+        {english: 'Do you deliver?', local: 'നിങ്ങൾ ഹോം ഡെലിവറി ചെയ്യുമോ?', id: 'm31'},
+        {english: 'Is it available in another color?', local: 'ഇത് വേറെ നിറത്തിൽ ഉണ്ടോ?', id: 'm32'},
+        {english: 'Can I return this?', local: 'ഇത് തിരികെ നൽകാമോ?', id: 'm33'},
+        {english: 'Do you have any offers?', local: 'ഓഫറുകൾ ഉണ്ടോ?', id: 'm34'},
+        {english: 'This is too small', local: 'ഇത് വളരെ ചെറുതാണ്', id: 'm35'}
+    ]
+},
+
+'Transportation': {
+    phrases: [
+        {english: 'Where is the bus stop?', local: 'ബസ് സ്റ്റോപ്പ് എവിടെയാണ്?', id: 'm36'},
+        {english: 'How much is a ticket?', local: 'ടിക്കറ്റിന് എത്ര?', id: 'm37'},
+        {english: 'Does this bus go to...?', local: 'ഈ ബസ് ... ക്ക് പോകുമോ?', id: 'm38'},
+        {english: 'Where can I get a taxi?', local: 'എനിക്ക് ഒരു ടാക്സി എവിടെ നിന്ന് ലഭിക്കും?', id: 'm39'},
+        {english: 'Please stop here', local: 'ദയവായി ഇവിടെ നിർത്തുക', id: 'm40'},
+        {english: 'Where is the railway station?', local: 'റെയിൽവേ സ്റ്റേഷൻ എവിടെയാണ്?', id: 'm41'},
+        {english: 'How long will it take?', local: 'എത്ര സമയമെടുക്കും?', id: 'm42'},
+        {english: 'I want to go to the airport', local: 'എനിക്ക് എയർപോർട്ടിലേക്ക് പോകണം', id: 'm43'},
+        {english: 'Is this seat free?', local: 'ഈ സീറ്റ് ഫ്രീ ആണോ?', id: 'm44'},
+        {english: 'When is the next bus?', local: 'അടുത്ത ബസ് എപ്പോൾ?', id: 'm45'},
+        {english: 'Is this the correct platform?', local: 'ഇത് ശരിയായ പ്ലാറ്റ്ഫോം ആണോ?', id: 'm46'},
+        {english: 'How far is it?', local: 'ഇത് എത്ര ദൂരമാണ്?', id: 'm47'},
+        {english: 'I missed my bus', local: 'എന്റെ ബസ് നഷ്ടപ്പെട്ടു', id: 'm48'},
+        {english: 'Is there a direct bus?', local: 'നേരിട്ട് പോകുന്ന ബസ് ഉണ്ടോ?', id: 'm49'},
+        {english: 'Can I get a bus to city center?', local: 'സിറ്റി സെന്ററിലേക്ക് ബസ് ലഭ്യമായിട്ടുണ്ടോ?', id: 'm50'}
+    ]
+},
+
+'Medical': {
+    phrases: [
+        {english: 'I need a doctor', local: 'എനിക്ക് ഒരു ഡോക്ടർ വേണം', id: 'm51'},
+        {english: 'Where is the hospital?', local: 'ആശുപത്രി എവിടെയാണ്?', id: 'm52'},
+        {english: 'I have a fever', local: 'എനിക്ക് പനി ഉണ്ട്', id: 'm53'},
+        {english: 'It hurts here', local: 'ഇവിടെ വേദനിക്കുന്നു', id: 'm54'},
+        {english: 'I\'m allergic to...', local: 'എനിക്ക് ... അലർജി ഉണ്ട്', id: 'm55'},
+        {english: 'I need medicine', local: 'എനിക്ക് മരുന്ന് വേണം', id: 'm56'},
+        {english: 'Call an ambulance', local: 'ഒരു ആംബുലൻസ് വിളിക്കൂ', id: 'm57'},
+        {english: 'I feel dizzy', local: 'എനിക്ക് തലകറക്കുന്നു', id: 'm58'},
+        {english: 'I have a headache', local: 'എനിക്ക് തലവേദനയുണ്ട്', id: 'm59'},
+        {english: 'Where is the nearest pharmacy?', local: 'അടിസ്ഥാന മരുന്ന് കട എവിടെയാണ്?', id: 'm60'}
+    ]
+}
+
+                  }      },
+            'Andhra': {
+                language: 'Telugu',
+                image: 'https://img.freepik.com/premium-vector/indian-state-andhra-pradesh-vector-map-with-masked-hindu-temple-state-telugu-telangana_1072380-1213.jpg',
+                categories: {
+                    'Basic': {
+    phrases: [
+        {english: 'Hello', local: 'నమస్కారం', id: 'te1'},
+        {english: 'Thank you', local: 'ధన్యవాదాలు', id: 'te2'},
+        {english: 'Yes', local: 'అవును', id: 'te3'},
+        {english: 'No', local: 'లేదు', id: 'te4'},
+        {english: 'Please', local: 'దయచేసి', id: 'te5'},
+        {english: 'Excuse me', local: 'క్షమించండి', id: 'te6'},
+        {english: 'I don\'t understand', local: 'నాకు అర్థం కాలేదు', id: 'te7'},
+        {english: 'How much does this cost?', local: 'ఇది ఎంత?', id: 'te8'},
+        {english: 'Where is the restroom?', local: 'టాయిలెట్ ఎక్కడ ఉంది?', id: 'te9'},
+        {english: 'Goodbye', local: 'వీడ్కోలు', id: 'te10'},
+        {english: 'What is your name?', local: 'మీ పేరు ఏమిటి?', id: 'te11'},
+        {english: 'My name is...', local: 'నా పేరు...', id: 'te12'},
+        {english: 'How are you?', local: 'మీరు ఎలా ఉన్నారు?', id: 'te13'},
+        {english: 'I am fine', local: 'నేను బాగున్నాను', id: 'te14'},
+        {english: 'Can you help me?', local: 'మీరు నాకు సహాయం చేయగలరా?', id: 'te15'}
+    ]
+},
+'Shopping': {
+    phrases: [
+        {english: 'How much does this cost?', local: 'ఇది ఎంత?', id: 'te16'},
+        {english: 'That\'s too expensive', local: 'ఇది చాలా ఖరీదైనది', id: 'te17'},
+        {english: 'Do you have this in another size?', local: 'ఇది మరొక పరిమాణంలో ఉందా?', id: 'te18'},
+        {english: 'Can you give me a discount?', local: 'మీరు నాకు తగ్గింపు ఇవ్వగలరా?', id: 'te19'},
+        {english: 'I\'m just looking', local: 'నేను చూస్తున్నాను', id: 'te20'},
+        {english: 'I want to buy this', local: 'నేను దీన్ని కొనాలనుకుంటున్నాను', id: 'te21'},
+        {english: 'Can I try this on?', local: 'నేను దీన్ని ట్రై చేయగలనా?', id: 'te22'},
+        {english: 'Where is the billing counter?', local: 'బిల్లింగ్ కౌంటర్ ఎక్కడ ఉంది?', id: 'te23'},
+        {english: 'Do you accept cards?', local: 'మీరు కార్డులు తీసుకుంటారా?', id: 'te24'},
+        {english: 'Is this fresh?', local: 'ఇది తాజా的吗?', id: 'te25'},
+        {english: 'Can I return this?', local: 'నేను దీన్ని తిరిగి ఇచ్చేయగలనా?', id: 'te26'},
+        {english: 'What are your store timings?', local: 'మీ షాప్ టైమింగ్స్ ఏమిటి?', id: 'te27'},
+        {english: 'Is there a warranty?', local: 'దీనిపై వారంటీ ఉందా?', id: 'te28'},
+        {english: 'I want a receipt', local: 'నాకు రశీదు కావాలి', id: 'te29'},
+        {english: 'Where is the changing room?', local: 'మార్చే గది ఎక్కడ ఉంది?', id: 'te30'}
+    ]
+},
+'Transportation': {
+    phrases: [
+        {english: 'Where is the bus station?', local: 'బస్ స్టేషన్ ఎక్కడ ఉంది?', id: 'te31'},
+        {english: 'How much is a ticket?', local: 'టికెట్ ఎంత?', id: 'te32'},
+        {english: 'Does this bus go to...?', local: 'ఈ బస్సు ... కు వెళ్తుందా?', id: 'te33'},
+        {english: 'Where can I get a taxi?', local: 'నేను టాక్సీ ఎక్కడ పొందగలను?', id: 'te34'},
+        {english: 'Please stop here', local: 'దయచేసి ఇక్కడ ఆపండి', id: 'te35'},
+        {english: 'I want to go to the airport', local: 'నాకు విమానాశ్రయానికి వెళ్లాలి', id: 'te36'},
+        {english: 'How long will it take?', local: 'ఎంత సమయం పడుతుంది?', id: 'te37'},
+        {english: 'Is this the right platform?', local: 'ఇది సరైన ప్లాట్‌ఫామ్ా?', id: 'te38'},
+        {english: 'When is the next train?', local: 'తర్వాతి రైలు ఎప్పుడు వస్తుంది?', id: 'te39'},
+        {english: 'Can you show me on the map?', local: 'మీరు నాకు మ్యాప్‌లో చూపగలరా?', id: 'te40'},
+        {english: 'Is it far from here?', local: 'ఇది ఇక్కడినుండి దూరమా?', id: 'te41'},
+        {english: 'I missed my bus', local: 'నా బస్సు మిస్ అయ్యింది', id: 'te42'},
+        {english: 'Can I rent a bike?', local: 'నేను బైక్ అద్దెకు తీసుకోవచ్చా?', id: 'te43'},
+        {english: 'Is there parking available?', local: 'ఇక్కడ పార్కింగ్ సదుపాయం ఉందా?', id: 'te44'},
+        {english: 'What is the fare?', local: 'చార్జ్ ఎంత?', id: 'te45'}
+    ]
+},
+'Medical': {
+    phrases: [
+        {english: 'I need a doctor', local: 'నాకు ఒక డాక్టర్ కావాలి', id: 'te46'},
+        {english: 'Where is the hospital?', local: 'హాస్పిటల్ ఎక్కడ ఉంది?', id: 'te47'},
+        {english: 'I have a fever', local: 'నాకు జ్వరం ఉంది', id: 'te48'},
+        {english: 'It hurts here', local: 'ఇక్కడ నొప్పిగా ఉంది', id: 'te49'},
+        {english: 'I\'m allergic to...', local: 'నాకు ... కు అలెర్జి ఉంది', id: 'te50'},
+        {english: 'I feel dizzy', local: 'నాకు తలనంపి ఉంది', id: 'te51'},
+        {english: 'I need medicine', local: 'నాకు మందులు కావాలి', id: 'te52'},
+        {english: 'Call an ambulance', local: 'ఒక అంబులెన్స్ పిలవండి', id: 'te53'},
+        {english: 'Is there a pharmacy nearby?', local: 'ఇదురుగా ఫార్మసీ ఉందా?', id: 'te54'},
+        {english: 'I am diabetic', local: 'నాకు షుగర్ ఉంది', id: 'te55'},
+        {english: 'I have high blood pressure', local: 'నాకు హై బీపీ ఉంది', id: 'te56'},
+        {english: 'I need a painkiller', local: 'నాకు నొప్పి తగ్గించే మందు కావాలి', id: 'te57'},
+        {english: 'I got injured', local: 'నాకు గాయం అయింది', id: 'te58'},
+        {english: 'Is this serious?', local: 'ఇది తీవ్రమా?', id: 'te59'},
+        {english: 'How much is the consultation fee?', local: 'కన్సల్టేషన్ ఫీజు ఎంత?', id: 'te60'}
+    ]
+}
+                }
+            }
+        };
+
+        // App state
+        let currentState = null;
+        let currentLanguage = null;
+        let currentCategory = null;
+        let learnedPhrases = JSON.parse(localStorage.getItem('learnedPhrases')) || {};
+        let quizState = {
+            type: null,
+            questions: [],
+            currentQuestion: 0,
+            score: 0,
+            answered: 0
+        };
+
+        // DOM elements
+        const stateSelectionEl = document.getElementById('state-selection');
+        const languageScreenEl = document.getElementById('language-screen');
+        const languageTitleEl = document.getElementById('language-title');
+        const languageImageEl = document.getElementById('language-image');
+        const categoryContainerEl = document.getElementById('category-container');
+        const phrasesScreenEl = document.getElementById('phrases-screen');
+        const categoryTitleEl = document.getElementById('category-title');
+        const phrasesContainerEl = document.getElementById('phrases-container');
+        const quizSelectionEl = document.getElementById('quiz-selection');
+        const quizMatchingEl = document.getElementById('quiz-matching');
+        const quizFillEl = document.getElementById('quiz-fill');
+        const quizListeningEl = document.getElementById('quiz-listening');
+        const quizResultsEl = document.getElementById('quiz-results');
+        const progressTextEl = document.getElementById('progress-text');
+        const progressBarEl = document.getElementById('progress-bar');
+
+        // State selection
+        function selectState(state) {
+            currentState = state;
+            currentLanguage = stateData[state].language;
+            
+            // Update UI
+            stateSelectionEl.classList.add('hidden');
+            languageScreenEl.classList.remove('hidden');
+            languageTitleEl.textContent = `Ready to learn ${currentLanguage}!`;
+            languageImageEl.src = stateData[state].image;
+            
+            // Populate categories
+            categoryContainerEl.innerHTML = '';
+            for (const category in stateData[state].categories) {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'card bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:bg-indigo-50';
+                categoryCard.onclick = () => selectCategory(category);
+                
+                categoryCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-center justify-center mb-4">
+                            <img src="https://previews.123rf.com/images/dizanna/dizanna1703/dizanna170300669/74191518-learn-something-new-circle-word-cloud-business-concept.jpg" alt="${category} category icon with ${currentLanguage} language symbols" class="w-16 h-16 rounded-full" />
+                        </div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-2">${category}</h3>
+                        <p class="text-gray-600">Learn ${state} ${currentLanguage} ${category.toLowerCase()} phrases</p>
+                    </div>
+                `;
+                
+                categoryContainerEl.appendChild(categoryCard);
+            }
+            
+            // Initialize learned phrases for this state if not exists
+            if (!learnedPhrases[state]) {
+                learnedPhrases[state] = {};
+                saveLearnedPhrases();
+            }
+        }
+
+        // Category selection
+        function selectCategory(category) {
+            currentCategory = category;
+            
+            // Update UI
+            languageScreenEl.classList.add('hidden');
+            phrasesScreenEl.classList.remove('hidden');
+            categoryTitleEl.textContent = `${category} Phrases in ${currentLanguage}`;
+            
+            // Populate phrases
+            populatePhrases();
+            updateProgress();
+        }
+
+        // Back buttons functionality
+        function backToStates() {
+            languageScreenEl.classList.add('hidden');
+            stateSelectionEl.classList.remove('hidden');
+        }
+
+        function backToCategories() {
+            phrasesScreenEl.classList.add('hidden');
+            quizSelectionEl.classList.add('hidden');
+            quizMatchingEl.classList.add('hidden');
+            quizFillEl.classList.add('hidden');
+            quizListeningEl.classList.add('hidden');
+            quizResultsEl.classList.add('hidden');
+            languageScreenEl.classList.remove('hidden');
+        }
+
+        function backToPhrases() {
+            quizSelectionEl.classList.add('hidden');
+            quizMatchingEl.classList.add('hidden');
+            quizFillEl.classList.add('hidden');
+            quizListeningEl.classList.add('hidden');
+            quizResultsEl.classList.add('hidden');
+            phrasesScreenEl.classList.remove('hidden');
+        }
+
+        // Populate phrases for current state and category
+        function populatePhrases() {
+            phrasesContainerEl.innerHTML = '';
+            
+            const phrases = stateData[currentState].categories[currentCategory].phrases;
+            
+            phrases.forEach(phrase => {
+                const phraseEl = document.createElement('div');
+                phraseEl.className = 'bg-indigo-50 rounded-lg p-4';
+                
+                // Check if phrase is already learned
+                const isLearned = learnedPhrases[currentState][phrase.id] === true;
+                
+                phraseEl.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-bold text-lg text-indigo-800">${phrase.english}</h4>
+                            <p class="${isLearned ? 'text-green-600' : 'text-indigo-600'} font-medium">${phrase.local}</p>
+                        </div>
+                        <button onclick="speakPhrase('${phrase.local}', '${currentLanguage}')" class="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600 text-white speak-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 010-7.072m12.728 0l-5.657 5.657M5.586 15.536L11.243 9.88" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <button onclick="markAsLearned('${phrase.id}', this)" class="px-3 py-1 rounded text-sm ${isLearned ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}">
+                            ${isLearned ? '✓ Learned' : 'Mark as Learned'}
+                        </button>
+                    </div>
+                `;
+                
+                phrasesContainerEl.appendChild(phraseEl);
+            });
+        }
+
+        // Speak phrase using Web Speech API
+        function speakPhrase(text, lang) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set language based on selected state
+            switch(lang) {
+                case 'Hindi':
+                    utterance.lang = 'hi-IN';
+                    break;
+                case 'Tamil':
+                    utterance.lang = 'ta-IN';
+                    break;
+                case 'Malayalam':
+                    // Try best available option for Malayalam
+                    if (window.speechSynthesis.getVoices().some(v => v.lang === 'ml-IN')) {
+                        utterance.lang = 'ml-IN';
+                    } else if (window.speechSynthesis.getVoices().some(v => v.lang.startsWith('hi'))) {
+                        utterance.lang = 'hi-IN'; // Fallback to Hindi
+                    } else {
+                        utterance.lang = 'en-US'; // Final fallback
+                    }
+                    break;
+                case 'Telugu':
+                    utterance.lang = 'te-IN';
+                    break;
+                default:
+                    utterance.lang = 'en-US';
+            }
+            
+            // Set a reasonable rate and pitch
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Mark phrase as learned
+        function markAsLearned(phraseId, button) {
+            if (!learnedPhrases[currentState][phraseId]) {
+                learnedPhrases[currentState][phraseId] = true;
+                button.textContent = '✓ Learned';
+                button.className = 'px-3 py-1 rounded text-sm bg-green-100 text-green-800';
+                saveLearnedPhrases();
+                updateProgress();
+            }
+        }
+
+        // Save learned phrases to localStorage
+        function saveLearnedPhrases() {
+            localStorage.setItem('learnedPhrases', JSON.stringify(learnedPhrases));
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const categoryPhrases = stateData[currentState].categories[currentCategory].phrases;
+            const learnedCount = categoryPhrases.filter(p => learnedPhrases[currentState][p.id]).length;
+            const totalCount = categoryPhrases.length;
+            const percentage = Math.round((learnedCount / totalCount) * 100);
+            
+            progressTextEl.textContent = `${learnedCount}/${totalCount}`;
+            progressBarEl.style.width = `${percentage}%`;
+        }
+
+        // Quiz functions
+        function startQuiz() {
+            phrasesScreenEl.classList.add('hidden');
+            quizSelectionEl.classList.remove('hidden');
+        }
+
+        function startSpecificQuiz(type) {
+            quizState.type = type;
+            quizState.questions = [];
+            quizState.currentQuestion = 0;
+            quizState.score = 0;
+            quizState.answered = 0;
+            
+            // Prepare questions based on type
+            const allPhrases = stateData[currentState].categories[currentCategory].phrases;
+            
+            if (type === 'matching') {
+                // Shuffle phrases for matching game
+                quizState.questions = [...allPhrases].sort(() => Math.random() - 0.5).slice(0, 5);
+                loadMatchingQuestion();
+            } else if (type === 'fill') {
+// Create MCQ questions
+quizState.questions = allPhrases.map(phrase => {
+    // Pick 3 random wrong options
+    const otherOptions = allPhrases.filter(p => p.id !== phrase.id)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3)
+        .map(p => p.local);
+
+    // Add correct answer and shuffle
+    const options = [...otherOptions, phrase.local].sort(() => Math.random() - 0.5);
+
+    return {
+        question: phrase.english,
+        correctAnswer: phrase.local,
+        options
+    };
+}).sort(() => Math.random() - 0.5).slice(0, 5);
+
+loadMCQQuestion();
+
+            } else if (type === 'listening') {
+                // Create listening questions
+                quizState.questions = [...allPhrases].sort(() => Math.random() - 0.5).slice(0, 5);
+                loadListeningQuestion();
+            }
+            
+            // Show the appropriate quiz screen
+            quizSelectionEl.classList.add('hidden');
+            
+            if (type === 'matching') {
+                quizMatchingEl.classList.remove('hidden');
+            } else if (type === 'fill') {
+                quizFillEl.classList.remove('hidden');
+            } else if (type === 'listening') {
+                quizListeningEl.classList.remove('hidden');
+            }
+        }
+
+        // Matching game functions
+        function loadMatchingQuestion() {
+            document.getElementById('quiz-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+            
+            const originalContainer = document.getElementById('match-original');
+            const translationContainer = document.getElementById('match-translation');
+            
+            originalContainer.innerHTML = '';
+            translationContainer.innerHTML = '';
+            
+            // Add original phrases
+            quizState.questions.forEach((phrase, index) => {
+                const phraseEl = document.createElement('div');
+                phraseEl.className = 'bg-indigo-100 p-3 rounded-lg cursor-move text-center font-medium';
+                phraseEl.textContent = phrase.english;
+                phraseEl.id = `original-${index}`;
+                phraseEl.draggable = true;
+                phraseEl.ondragstart = (e) => e.dataTransfer.setData('text/plain', index);
+                originalContainer.appendChild(phraseEl);
+            });
+            
+            // Add shuffled translations
+            const shuffledTranslations = [...quizState.questions]
+                .sort(() => Math.random() - 0.5)
+                .map(phrase => phrase.local);
+            
+            shuffledTranslations.forEach((translation, index) => {
+                const translationEl = document.createElement('div');
+                translationEl.className = 'bg-indigo-100 p-3 rounded-lg cursor-move text-center font-medium';
+                translationEl.textContent = translation;
+                translationEl.id = `translation-${index}`;
+                translationEl.draggable = true;
+                translationEl.ondragstart = (e) => e.dataTransfer.setData('text/plain', translation);
+                translationEl.ondragover = (e) => e.preventDefault();
+                translationEl.ondrop = (e) => {
+                    e.preventDefault();
+                    const originalIndex = e.dataTransfer.getData('text/plain');
+                    const originalEl = document.getElementById(`original-${originalIndex}`);
+                    originalEl.parentNode.insertBefore(translationEl, originalEl.nextSibling);
+                };
+                translationContainer.appendChild(translationEl);
+            });
+        }
+function loadMCQQuestion() {
+    const container = document.getElementById('fill-container');
+    container.innerHTML = '';
+
+    const q = quizState.questions[quizState.currentQuestion];
+
+    const questionEl = document.createElement('div');
+    questionEl.className = 'mb-6';
+    questionEl.innerHTML = `
+        <p class="text-xl font-medium mb-4">What is the correct translation for:</p>
+        <div class="bg-indigo-50 p-4 rounded-lg mb-4 text-lg font-semibold text-center">${q.question}</div>
+        <div class="space-y-3" id="mcq-options">
+            ${q.options.map((opt, idx) => `
+                <button class="w-full text-left p-3 bg-white rounded-lg border hover:bg-indigo-100 quiz-option"
+                        onclick="checkMCQAnswer(this, '${opt}', '${q.correctAnswer}')">
+                    ${opt}
+                </button>
+            `).join('')}
+        </div>
+    `;
+
+    container.appendChild(questionEl);
+    document.getElementById('fill-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+}
+function checkMCQAnswer(button, selected, correct) {
+    const options = document.querySelectorAll('#mcq-options .quiz-option');
+    options.forEach(opt => {
+        opt.disabled = true;
+        if (opt.textContent === correct) {
+            opt.classList.add('correct');
+        } else if (opt.textContent === selected) {
+            opt.classList.add('incorrect');
+        }
+    });
+
+    if (selected === correct) quizState.score++;
+    quizState.answered++;
+
+    const feedback = document.createElement('div');
+    feedback.className = 'mt-4 p-3 rounded-lg';
+    feedback.innerHTML = `
+        <p class="font-medium">${selected === correct ? '✅ Correct!' : '❌ Incorrect!'}</p>
+        <p class="mt-1">Correct answer: <strong>${correct}</strong></p>
+    `;
+    document.getElementById('fill-container').appendChild(feedback);
+
+    // Add Next button
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = 'Next Question';
+    nextBtn.className = 'mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700';
+    nextBtn.onclick = nextMCQQuestion;
+    document.getElementById('fill-container').appendChild(nextBtn);
+
+    document.getElementById('fill-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+}
+function nextMCQQuestion() {
+    quizState.currentQuestion++;
+    if (quizState.currentQuestion < quizState.questions.length) {
+        loadMCQQuestion();
+    } else {
+        showQuizResults();
+    }
+}
+
+        function checkMatching() {
+            const answers = document.querySelectorAll('#match-original > div');
+            let correct = 0;
+            
+            quizState.questions.forEach((question, index) => {
+                const answerEl = answers[index * 2 + 1]; // Next sibling after original
+                if (answerEl && answerEl.textContent === question.local) {
+                    correct++;
+                    answerEl.classList.add('bg-green-100');
+                } else if (answerEl) {
+                    answerEl.classList.add('bg-red-100');
+                }
+            });
+            
+            quizState.score += correct;
+            quizState.answered += quizState.questions.length;
+            
+            // Update score and show results
+            document.getElementById('quiz-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+            
+            // Show correct answers
+            setTimeout(() => {
+                if (quizState.answered < 15) {
+                    startSpecificQuiz('matching');
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        // Fill in the blank functions
+        function loadFillQuestion() {
+            document.getElementById('fill-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+            
+            const fillContainer = document.getElementById('fill-container');
+            fillContainer.innerHTML = '';
+            
+            const question = quizState.questions[quizState.currentQuestion];
+            const words = question.local.split(' ');
+            const blank = question.blankIndex;
+            
+            // Create question display with blank
+            const questionEl = document.createElement('div');
+            questionEl.className = 'mb-6';
+            
+            let questionHTML = '<p class="text-xl font-medium mb-4">Choose The Correct Answer:</p><div class="bg-indigo-50 p-4 rounded-lg"><p class="text-lg">';
+            
+            words.forEach((word, index) => {
+                if (index === blank) {
+                    questionHTML += ` <span class="inline-block px-1 bg-white border-b-2 border-indigo-600 min-w-[60px]" id="blank-word">_____</span> `;
+                } else {
+                    questionHTML += ` ${word} `;
+                }
+            });
+            
+            questionHTML += '</p></div>';
+            
+            // Add answer input
+            questionHTML += `
+                <div class="mt-4">
+                    <p class="font-medium mb-2">Answer:</p>
+                    <input type="text" id="fill-answer" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Type the missing word">
+                </div>
+                <button onclick="checkFillAnswer()" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">Submit</button>
+            `;
+            
+            questionEl.innerHTML = questionHTML;
+            fillContainer.appendChild(questionEl);
+            
+            // Set focus to input
+            document.getElementById('fill-answer').focus();
+        }
+
+        function checkFillAnswer() {
+            const input = document.getElementById('fill-answer');
+            const answer = input.value.trim().toLowerCase();
+            const question = quizState.questions[quizState.currentQuestion];
+            const correctWord = question.english.split(' ')[question.blankIndex].toLowerCase();
+            
+            if (answer === correctWord) {
+                quizState.score++;
+                input.classList.remove('border-gray-300');
+                input.classList.add('border-green-500');
+            } else {
+                input.classList.remove('border-gray-300');
+                input.classList.add('border-red-500');
+            }
+            
+            quizState.answered++;
+            
+            // Show feedback
+            const feedbackEl = document.createElement('div');
+            feedbackEl.className = 'mt-4 p-3 rounded-lg';
+            feedbackEl.innerHTML = `
+                <p class="font-medium">${answer === correctWord ? 'Correct!' : 'Incorrect!'}</p>
+                <p class="mt-1">The answer was: <span class="font-bold">${correctWord}</span></p>
+                <p class="mt-2">Full phrase: ${question.english}</p>
+                <p class="mt-1 font-medium">${question.local}</p>
+            `;
+            
+            document.getElementById('fill-container').appendChild(feedbackEl);
+            
+            // Disable input and change button
+            input.disabled = true;
+            const button = document.querySelector('#fill-container button');
+            button.textContent = 'Next Question';
+            button.onclick = nextFillQuestion;
+            button.className = 'mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700';
+            
+            // Update score
+            document.getElementById('fill-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+        }
+
+        function nextFillQuestion() {
+            quizState.currentQuestion++;
+            
+            if (quizState.currentQuestion < quizState.questions.length) {
+                loadMCQQuestion();
+
+            } else {
+                showQuizResults();
+            }
+        }
+
+        // Listening test functions
+        function loadListeningQuestion() {
+            document.getElementById('listen-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+            
+            const optionsContainer = document.getElementById('listen-options');
+            optionsContainer.innerHTML = '';
+            
+            const currentPhrase = quizState.questions[quizState.currentQuestion];
+            const otherPhrases = stateData[currentState].categories[currentCategory].phrases
+                .filter(p => p.id !== currentPhrase.id)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            // Combine correct answer with wrong answers and shuffle
+            const options = [currentPhrase, ...otherPhrases].sort(() => Math.random() - 0.5);
+            
+            // Create options
+            options.forEach((phrase, index) => {
+                const optionEl = document.createElement('button');
+                optionEl.className = 'w-full text-left p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 quiz-option';
+                optionEl.textContent = phrase.english;
+                optionEl.onclick = () => checkListeningAnswer(phrase.id === currentPhrase.id);
+                optionsContainer.appendChild(optionEl);
+            });
+        }
+
+        function playListeningQuestion() {
+            const currentPhrase = quizState.questions[quizState.currentQuestion];
+            speakPhrase(currentPhrase.local, currentLanguage);
+        }
+
+        function checkListeningAnswer(isCorrect) {
+            const options = document.querySelectorAll('#listen-options .quiz-option');
+            
+            options.forEach(option => {
+                option.disabled = true;
+                if (isCorrect && option.textContent === quizState.questions[quizState.currentQuestion].english) {
+                    option.classList.add('correct');
+                } else if (!isCorrect && option.textContent === quizState.questions[quizState.currentQuestion].english) {
+                    option.classList.add('correct');
+                }
+            });
+            
+            if (isCorrect) {
+                quizState.score++;
+            }
+            
+            quizState.answered++;
+            
+            // Update score
+            document.getElementById('listen-score').textContent = `Score: ${quizState.score}/${quizState.answered}`;
+            
+            // Show next question or results
+            setTimeout(() => {
+                quizState.currentQuestion++;
+                
+                if (quizState.currentQuestion < quizState.questions.length) {
+                    loadListeningQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 1500);
+        }
+
+        // Show quiz results
+        function showQuizResults() {
+            // Hide all quiz screens
+            quizMatchingEl.classList.add('hidden');
+            quizFillEl.classList.add('hidden');
+            quizListeningEl.classList.add('hidden');
+            
+            // Show results screen
+            quizResultsEl.classList.remove('hidden');
+            
+            // Update results
+            const percentage = Math.round((quizState.score / quizState.answered) * 100);
+            document.getElementById('results-score').textContent = `You scored ${quizState.score} out of ${quizState.answered}!`;
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Excellent work! You\'re ready for your trip!';
+            } else if (percentage >= 70) {
+                message = 'Good job! With a little more practice you\'ll be fluent!';
+            } else if (percentage >= 50) {
+                message = 'Not bad! Keep practicing to improve your skills.';
+            } else {
+                message = 'Keep trying! Review the phrases and try again.';
+            }
+            
+            document.getElementById('results-message').textContent = message;
+            document.getElementById('results-title').textContent = percentage >= 70 ? 'Great Job!' : 'Quiz Complete!';
+        }
+
+        function practiceAgain() {
+            startSpecificQuiz(quizState.type);
+        }
+
+        // Initialize the app
+        function initApp() {
+            // Initialize speech synthesis
+            if ('speechSynthesis' in window) {
+                // Some browsers need voices to be loaded
+                window.speechSynthesis.onvoiceschanged = () => {
+                    // Voices should be available now
+                };
+            } else {
+                console.warn('Speech synthesis not supported in this browser');
+            }
+            
+            // Show state selection by default
+            stateSelectionEl.classList.remove('hidden');
+        }
+
+        // Start the app
+        window.onload = initApp;
+const translatorToolEl = document.getElementById('translator-tool');
+
+function showTranslator() {
+    stateSelectionEl.classList.add('hidden');
+    translatorToolEl.classList.remove('hidden');
+}
+
+async function translateAndSpeak() {
+    const text = document.getElementById('translate-input').value.trim();
+    const inputLang = document.getElementById('input-lang').value;
+    const outputLang = document.getElementById('output-lang').value;
+    const output = document.getElementById('translation-output');
+
+    if (!text) {
+        output.textContent = 'Please provide text to translate.';
+        return;
+    }
+
+    try {
+        const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${inputLang}&tl=${outputLang}&dt=t&q=${encodeURIComponent(text)}`);
+        const data = await res.json();
+        const translated = data[0][0][0];
+        output.textContent = translated;
+
+        // Speak output
+        const utterance = new SpeechSynthesisUtterance(translated);
+        utterance.lang = {
+            'hi': 'hi-IN',
+            'ta': 'ta-IN',
+            'ml': 'ml-IN',
+            'te': 'te-IN',
+            'en': 'en-US'
+        }[outputLang] || 'en-US';
+
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+
+    } catch (err) {
+        console.error(err);
+        output.textContent = 'Translation failed.';
+    }
+}
+
+// 🎙️ Start voice recognition
+function startVoiceInput() {
+    const inputLang = document.getElementById('input-lang').value;
+    const recognitionLang = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'ta': 'ta-IN',
+        'ml': 'ml-IN',
+        'te': 'te-IN'
+    }[inputLang] || 'en-US';
+
+    if (!('webkitSpeechRecognition' in window)) {
+        alert('Speech recognition not supported in this browser.');
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = recognitionLang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('translate-input').value = transcript;
+    };
+
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error', event);
+        alert('Could not recognize speech.');
+    };
+}
+
+    </script>
+</body>
+</html>
+

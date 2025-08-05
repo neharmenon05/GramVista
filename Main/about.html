@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Gram Vistas | Team Ethno Tech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0c6fa;
+            color: #333;
+        }        
+
+        .btn-grow {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-grow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .bg-dark-green {
+            background-color: #17411d;
+        }
+        
+        .text-dark-green {
+            color: #166e39;
+        }
+        
+        .border-dark-green {
+            border-color: #001707;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <div class="container mx-auto px-4 pt-6">
+        <a href="index.html" class="inline-block btn-grow bg-dark-green text-white px-6 py-2 rounded-full shadow-md hover:bg-opacity-90">
+            ← Back to Home
+        </a>
+    </div>
+
+    <!-- Main Title Section -->
+    <section class="py-12 px-4 bg-dark-green text-white">
+        <div class="container mx-auto text-center">
+            <img src="../photos/logo.png" alt="GramVistas Logo" class="h-[140px] mr-4 inline-block align-middle">
+            <h1 class="text-4xl font-bold mb-4">Gram Vista</h1>
+            <p class="text-xl max-w-2xl mx-auto mb-8">Sustainable Rural Tourism Platform for Village Empowerment</p>
+            <p class="text-lg mt-8 max-w-3xl mx-auto bg-white bg-opacity-20 p-6 rounded-lg shadow-inner">
+                An innovative platform developed by Team Ethno Tech for the Indosys Global Hackathon, focusing on sustainable tourism, village empowerment, and cultural preservation.
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 text-dark-green">Our Core Features</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card-hover bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-center mb-4">
+                        <div class="bg-dark-green bg-opacity-10 p-4 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-dark-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3 text-dark-green">Cultural Experiences</h3>
+                    <p class="text-gray-600 text-center">Authentic village homestays and immersive cultural activities that directly benefit local communities.</p>
+                </div>
+                
+                <div class="card-hover bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-center mb-4">
+                        <div class="bg-dark-green bg-opacity-10 p-4 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-dark-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3 text-dark-green">Economic Impact</h3>
+                    <p class="text-gray-600 text-center">Creating sustainable livelihoods for rural communities through tourism and local entrepreneurship.</p>
+                </div>
+                
+                <div class="card-hover bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-center mb-4">
+                        <div class="bg-dark-green bg-opacity-10 p-4 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-dark-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4m8-4v4m-8 8h10m-8 4h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3 text-dark-green">Sustainable Practices</h3>
+                    <p class="text-gray-600 text-center">Implementing eco-friendly tourism practices that protect the environment while boosting local economies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-16 px-4 bg-gray-50">
+        <div class="container mx-auto ">
+            <h2 class="text-3xl font-bold  text-center mb-12 text-dark-green">Meet Our Team</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+                <!-- Team Member 1 -->
+                <div class="card-hover bg-white overflow-hidden shadow-md transition-all duration-300">
+                    <div class="p-4">
+                       <img src="../photos/NRM.jpg" alt="TM1" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+                        <h3 class="text-xl font-bold text-center text-gray-800">Neha R Menon</h3>
+                        <p class="text-teal-600 text-center">Member</p>            
+                    </div>
+                </div>
+                
+                <!-- Team Member 2 -->
+                <div class="card-hover bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                    <div class="p-4">
+                        <img src="../photos/MSK.jpg" alt="TM1" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+                        <h3 class="text-xl font-bold text-center text-gray-800">Malvika S prasad</h3>
+                        <p class="text-teal-600 text-center">Member</p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 3 -->
+                <div class="card-hover bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                    <div class="p-4">
+                       <img src="../photos/AK.jpg" alt="TM1" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+                        <h3 class="text-xl font-bold text-center text-gray-800">Asmi K</h3>
+                        <p class="text-teal-600 text-center">Member</p>                        
+                    </div>
+                </div>
+                
+                <!-- Team Member 4 -->
+                <div class="card-hover bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                    <div class="p-4">
+                        <img src="../photos/GB.jpg" alt="TM1" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+                        <h3 class="text-xl font-bold text-center text-gray-800">Geshna B</h3>
+                        <p class="text-teal-600 text-center">Member</p>
+                    </div>
+                </div>
+                
+                <!-- Team Member 5 -->
+                <div class="card-hover bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300">
+                    <div class="p-4">
+                        <img src="../photos/DK.jpg" alt="TM1" class="w-32 h-32 object-cover rounded-full mx-auto mb-4" />
+                        <h3 class="text-xl font-bold text-center text-gray-800">Dedeepya</h3>
+                        <p class="text-teal-600 text-center">Member</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

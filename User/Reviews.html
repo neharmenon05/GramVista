@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Platform</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    .animate-pulse {
+      animation: pulse 0.3s ease-in-out;
+    }
+    .hover-scale:hover {
+      transform: scale(1.03);
+      transition: transform 0.2s ease-in-out;
+    }
+    .hover-bright:hover {
+      filter: brightness(1.2);
+      transition: filter 0.2s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div id="root" class="min-h-screen bg-gray-900"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const ReviewPlatform = () => {
+      const [reviews, setReviews] = useState([]);
+      const [formData, setFormData] = useState({
+        locationName: '',
+        rating: 0,
+        locationTag: '',
+        reviewText: '',
+        tags: '',
+        image: null,
+      });
+      const [filterTag, setFilterTag] = useState('');
+      const [isSubmitting, setIsSubmitting] = useState(false);
+
+      // Load reviews from localStorage on mount
+      useEffect(() => {
+        const savedReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+        setReviews(savedReviews);
+      }, []);
+
+      // Save reviews to localStorage when updated
+      useEffect(() => {
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+      }, [reviews]);
+
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+      };
+
+      const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setFormData({ ...formData, image: reader.result });
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      const handleRating = (rating) => {
+        setFormData({ ...formData, rating });
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setTimeout(() => {
+          const newReview = {
+            id: Date.now(),
+            ...formData,
+            tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+            upvotes: 0,
+            downvotes: 0,
+            createdAt: new Date().toLocaleString(),
+          };
+          setReviews([newReview, ...reviews]);
+          setFormData({ locationName: '', rating: 0, locationTag: '', reviewText: '', tags: '', image: null });
+          setIsSubmitting(false);
+        }, 500); // Simulate submission delay for animation
+      };
+
+      const handleVote = (id, type) => {
+        setReviews(reviews.map(review =>
+          review.id === id
+            ? { ...review, [type]: review[type] + 1 }
+            : review
+        ));
+      };
+
+      const filteredReviews = filterTag
+        ? reviews.filter(review => review.tags.includes(filterTag))
+        : reviews;
+
+      return (
+        <div className="container mx-auto p-4">
+          <h1 className="text-3xl font-bold mb-6 text-center text-green-100">Review Platform</h1>
+
+          {/* Review Form */}
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 animate-fadeIn">
+            <h2 className="text-xl font-semibold mb-4 text-green-200">Write a Review</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-green-300">Location/Service Name</label>
+                <input
+                  type="text"
+                  name="locationName"
+                  value={formData.locationName}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded bg-gray-700 text-green-100 border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 hover-bright"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-green-300">Rating</label>
+                <div className="flex space-x-2">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      type="button"
+                      key={star}
+                      onClick={() => handleRating(star)}
+                      className={`text-2xl transition-transform duration-200 hover:scale-110 ${
+                        formData.rating >= star ? 'text-yellow-400' : 'text-gray-500'
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-green-300">Location Tag</label>
+                <input
+                  type="text"
+                  name="locationTag"
+                  value={formData.locationTag}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded bg-gray-700 text-green-100 border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 hover-bright"
+                  placeholder="e.g., New York, NY"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-green-300">Review</label>
+                <textarea
+                  name="reviewText"
+                  value={formData.reviewText}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded bg-gray-700 text-green-100 border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 hover-bright"
+                  rows="4"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-green-300">Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  name="tags"
+                  value={formData.tags}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded bg-gray-700 text-green-100 border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 hover-bright"
+                  placeholder="e.g., restaurant, park"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-green-300">Upload Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full p-2 border rounded bg-gray-700 text-green-100 border-green-600 file:bg-green-600 file:text-white file:border-none file:p-2 file:rounded hover-bright"
+                />
+              </div>
+              <button
+                type="submit"
+                className={`w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 transition-colors duration-200 ${
+                  isSubmitting ? 'animate-pulse' : ''
+                }`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </form>
+          </div>
+
+          {/* Filter by Tag */}
+          <div className="mb-6 animate-fadeIn">
+            <label className="block text-sm font-medium text-green-300 mb-2">Filter by Tag</label>
+            <input
+              type="text"
+              value={filterTag}
+              onChange={(e) => setFilterTag(e.target.value)}
+              className="w-full p-2 border rounded bg-gray-700 text-green-100 border-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 hover-bright"
+              placeholder="Enter tag to filter reviews"
+            />
+          </div>
+
+          {/* Reviews List */}
+          <div className="space-y-4">
+            {filteredReviews.length === 0 && <p className="text-center text-green-300">No reviews found.</p>}
+            {filteredReviews.map((review, index) => (
+              <div
+                key={review.id}
+                className="bg-gray-800 p-6 rounded-lg shadow-lg hover-scale animate-fadeIn"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <h3 className="text-lg font-semibold text-green-100">{review.locationName}</h3>
+                <div className="flex items-center mb-2">
+                  <span className="text-yellow-400">{'★'.repeat(review.rating)}</span>
+                  <span className="text-gray-500">{'★'.repeat(5 - review.rating)}</span>
+                </div>
+                <p className="text-sm text-green-400">Location: {review.locationTag || 'N/A'}</p>
+                <p className="text-green-200 mt-2">{review.reviewText}</p>
+                {review.image && (
+                  <img src={review.image} alt="Review" className="mt-4 max-w-xs rounded hover-bright" />
+                )}
+                <div className="mt-2">
+                  <span className="text-sm text-green-400">Tags: </span>
+                  {review.tags.map(tag => (
+                    <span
+                      key={tag}
+                      className="inline-block bg-green-900 text-green-200 text-sm px-2 py-1 rounded mr-2 cursor-pointer hover:bg-green-700 transition-colors duration-200"
+                      onClick={() => setFilterTag(tag)}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-4 flex space-x-4">
+                  <button
+                    onClick={() => handleVote(review.id, 'upvotes')}
+                    className="text-green-400 hover:text-green-300 transition-colors duration-200 hover:scale-110"
+                  >
+                    👍 {review.upvotes}
+                  </button>
+                  <button
+                    onClick={() => handleVote(review.id, 'downvotes')}
+                    className="text-red-400 hover:text-red-300 transition-colors duration-200 hover:scale-110"
+                  >
+                    👎 {review.downvotes}
+                  </button>
+                </div>
+                <p className="text-sm text-green-400 mt-2">Posted on: {review.createdAt}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<ReviewPlatform />, document.getElementById('root'));
+  </script>
+</body>
+</html>

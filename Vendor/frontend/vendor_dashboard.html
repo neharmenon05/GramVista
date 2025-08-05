@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GramVista Vendor Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
+  <style>
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Color Palette - Inspired by nature/rural themes */
+  --primary-green: #2d5016;
+  --secondary-green: #4a7c59;
+  --accent-green: #7fb069;
+  --light-green: #a4c3a2;
+  --cream: #fefae0;
+  --warm-white: #f8f6f0;
+  --earth-brown: #8b5a3c;
+  --text-dark: #2c3e26;
+  --text-medium: #4a5d4a;
+  --text-light: #6b7d6b;
+  --border-light: #d4d4aa;
+  --shadow-soft: rgba(45, 80, 22, 0.1);
+  --shadow-medium: rgba(45, 80, 22, 0.15);
+  --shadow-strong: rgba(45, 80, 22, 0.2);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);
+  color: var(--text-dark);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Header Styling */
+header {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+  color: white;
+  padding: 24px 30px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  box-shadow: 0 4px 20px var(--shadow-medium);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,30 Q25,10 50,30 T100,30 L100,0 L0,0 Z" fill="rgba(255,255,255,0.05)"/></svg>') repeat-x;
+  background-size: 200px 40px;
+}
+
+/* Navigation Bar Styling */
+/* Normal navbar that scrolls with the page */
+.navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid var(--border-light);
+  padding: 16px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Remove these two lines for normal scrolling navbar:
+  position: sticky;
+  top: 0; */
+  z-index: 1500;
+  box-shadow: 0 2px 20px var(--shadow-soft);
+  min-height: 70px;
+}
+.navbar-brand {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-green);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.navbar-brand::before {
+  content: '🏠';
+  font-size: 28px;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-button {
+  background: linear-gradient(135deg, var(--secondary-green) 0%, var(--accent-green) 100%);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(74, 124, 89, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.nav-button:hover {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(74, 124, 89, 0.4);
+}
+
+.nav-button.active {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--earth-brown) 100%);
+  box-shadow: 0 4px 20px rgba(45, 80, 22, 0.4);
+}
+
+.nav-button.products::before {
+  content: '📦';
+}
+
+.nav-button.experiences::before {
+  content: '🎯';
+}
+
+.nav-button.profile::before {
+  content: '👤';
+}
+
+.nav-button.profile::after {
+  content: '▼';
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+/* Navigation Divider */
+.nav-divider {
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(180deg, transparent 0%, var(--border-light) 50%, transparent 100%);
+  margin: 0 8px;
+}
+
+/* Dropdown Styling */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: white;
+  min-width: 320px;
+  max-height: 450px;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px var(--shadow-strong);
+  z-index: 1000;
+  border-radius: 16px;
+  border: 2px solid var(--border-light);
+  backdrop-filter: blur(10px);
+}
+
+.dropdown-content.show {
+  display: block;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--secondary-green) 0%, var(--accent-green) 100%);
+  color: white;
+  font-weight: 600;
+  border-radius: 14px 14px 0 0;
+  font-size: 16px;
+}
+
+.dropdown-section {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.dropdown-section h4 {
+  margin: 0;
+  padding: 10px 20px;
+  background: linear-gradient(90deg, var(--cream) 0%, transparent 100%);
+  font-size: 13px;
+  color: var(--text-medium);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.experience-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background-color 0.2s ease;
+}
+
+.experience-item:hover {
+  background-color: var(--cream);
+}
+
+.experience-item:last-child {
+  border-bottom: none;
+}
+
+.experience-item h5 {
+  margin: 0 0 6px 0;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.experience-item p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.dropdown-logout {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 0 0 14px 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.dropdown-logout:hover {
+  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+  transform: translateY(-1px);
+}
+
+.profile-info {
+  padding: 12px 20px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: var(--warm-white);
+}
+
+/* Dashboard Layout */
+.dashboard {
+  padding: 40px 30px;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Card Styling */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 8px 32px var(--shadow-soft);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-green) 0%, var(--secondary-green) 100%);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px var(--shadow-medium);
+  border-color: var(--border-light);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--primary-green);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card p {
+  color: var(--text-medium);
+  margin: 10px 0;
+  font-size: 15px;
+}
+
+/* Button Styling */
+button {
+  background: linear-gradient(135deg, var(--secondary-green) 0%, var(--accent-green) 100%);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(74, 124, 89, 0.3);
+}
+
+button:hover {
+  background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(74, 124, 89, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px var(--shadow-soft);
+}
+
+table, th, td {
+  border: none;
+}
+
+th {
+  background: linear-gradient(135deg, var(--secondary-green) 0%, var(--accent-green) 100%);
+  color: white;
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text-medium);
+}
+
+tr:nth-child(even) {
+  background-color: var(--warm-white);
+}
+
+tr:hover {
+  background-color: var(--cream);
+}
+
+/* Product Styling */
+.product-image {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid var(--border-light);
+  transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+  transform: scale(1.05);
+}
+
+.product-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 2px solid var(--border-light);
+  margin-bottom: 16px;
+  padding: 20px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, white 0%, var(--warm-white) 100%);
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px var(--shadow-soft);
+  border-color: var(--accent-green);
+}
+
+.product-details {
+  flex: 1;
+}
+
+.product-details h4 {
+  margin: 0 0 8px 0;
+  color: var(--primary-green);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.product-details p {
+  margin: 4px 0;
+  color: var(--text-medium);
+  font-size: 14px;
+}
+
+.image-preview {
+  max-width: 240px;
+  max-height: 240px;
+  margin-top: 12px;
+  border: 2px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px var(--shadow-soft);
+}
+
+/* Footer Styling */
+footer {
+  background: linear-gradient(135deg, var(--text-medium) 0%, var(--text-dark) 100%);
+  color: white;
+  padding: 24px;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 20px 15px;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  header {
+    padding: 20px 15px;
+    font-size: 24px;
+  }
+  
+   .navbar {
+    padding: 12px 15px;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    min-height: auto;
+  } 
+  
+  .navbar-brand {
+    font-size: 20px;
+    align-self: flex-start;
+  }
+  
+  .navbar-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 8px;
+    justify-content: center;
+    margin-left: 0;
+  }
+  
+  .nav-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  
+  .nav-button {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+  
+  .nav-divider {
+    display: none;
+  }
+  
+  .dropdown-content {
+    min-width: 280px;
+  }
+  
+  .product-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--warm-white);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-green);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-green);
+}
+
+/* Modal/Form Overlay Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  z-index: 2500; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-green);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-medium);
+  padding: 4px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--cream);
+  color: var(--text-dark);
+}
+
+/* Form Styling */
+/* Remove modal styling and make it a regular inline form */
+.experience-form {
+  display: block; /* Change from none to block */
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 8px 32px var(--shadow-soft);
+  border: 2px solid var(--border-light);
+  margin-top: 20px;
+  /* Remove all position: fixed, z-index properties */
+}
+
+/* Remove or comment out these classes */
+/*
+.modal-overlay {
+  display: none;
+}
+
+.modal-content {
+  display: none;
+}
+*/
+
+/* Keep the form styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 14px;
+}
+
+.form-input, .form-textarea {
+  padding: 12px 16px;
+  border: 2px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 0 3px rgba(127, 176, 105, 0.1);
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+}
+
+.btn-secondary {
+  background: var(--text-light);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--text-medium);
+  transform: translateY(-1px);
+}
+/* Additional Utility Classes */
+.success-badge {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.warning-badge {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.info-badge {
+  background: linear-gradient(135deg, var(--accent-green) 0%, var(--secondary-green) 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Hide form when not in modal */
+.experience-form:not(.modal-content .experience-form) {
+  display: none;
+}
+  </style>
+</head>
+<body>
+
+<header>
+  GramVista Vendor Dashboard
+</header>
+
+
+      <nav class="navbar">
+  <a href="#" class="navbar-brand">GramVista Vendor</a>
+  <div class="navbar-actions">
+      <button class="nav-button-products" onclick="openProductPanel()">My Products</button>
+      <button class="nav-button experiences" onclick="openExperiencePanel()">My Experiences</button>
+
+    
+    <div class="nav-divider"></div>
+    <button onclick="toggleDropdown()" style="background-color:#006400; color:white; padding:8px 14px; border:none; border-radius:5px; display:flex; align-items:center; gap:8px;">
+        👤 <span id="vendorName">Guest</span> ▼
+      </button>
+  </div>
+</nav>
+
+      <div id="profileDropdown" class="dropdown-content">
+        <div class="dropdown-section">
+          <div class="profile-info">
+            <strong>Name:</strong> <span id="modalName">Guest</span><br>
+            <strong>Village:</strong> <span id="modalVillage">Unknown</span>
+          </div>
+        </div>
+        <div class="dropdown-section">
+          
+          <div id="profileExperiences">
+            <div style="padding: 8px 16px; color: #666; font-style: italic;">
+             
+            </div>
+          </div>
+        </div>
+        <div class="dropdown-logout" onclick="logout()">
+          🚪 Log Out
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="dashboard">
+  <div class="card">
+    <h3>Add New Experience</h3>
+    <p>List a new experience for tourists visiting your village.</p>
+    <button onclick="openModal()">Add Experience</button>
+  </div>
+
+  <div class="card">
+      <h3>Income simulator</h3>
+      <p>Clueless what to do with you resources?</p>
+      <button onclick="window.location.href='UI_IncomeSimulator.html'">Check Here</button>
+  </div>
+
+  <div class="card">
+    <h3>Stock Status & Prediction</h3>
+    <p>Pottery items: 12 left</p>
+    <p><b>Prediction:</b> Likely out of stock in 6 days</p>
+    <button onclick="window.location.href='vendor_stock_tracker.html'">Check Inventory</button>
+  </div>
+
+  <div class="card">
+    <h3>Current & Past Orders</h3>
+    <table>
+      <tr>
+        <th>Experience</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td>Farm Walk</td>
+        <td>10 July</td>
+        <td>Completed</td>
+      </tr>
+      <tr>
+        <td>Clay Workshop</td>
+        <td>12 July</td>
+        <td>Upcoming</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Financial Advisor </h3>
+    <ul>
+      <li>✅ Make right and smart decisions</li>
+      <li> Optimize your buisness and boost your savings</li>
+      <button onclick="window.location.href='finance.html'">Check Inventory</button>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Add New Product</h3>
+    <p>List handmade or local goods for sale.</p>
+    <button onclick="openProductModal()" >
+      ➕ Add Product
+    </button>
+  </div>
+</div>
+
+<footer>
+  GramVista © 2025 | Empowering Rural Entrepreneurs
+</footer>
+
+<!-- Experience Modal -->
+<div id="experienceModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+  <div style="background:white; width:90%; max-width:500px; margin:5% auto; padding:20px; border-radius:10px; position:relative;">
+    <h3>Add Experience</h3>
+    <form id="experienceForm">
+      <label>Experience Name:</label><br/>
+      <input type="text" id="expName" required style="width:100%; padding:8px; box-sizing:border-box;"><br/><br/>
+
+      <label>Description:</label><br/>
+      <textarea id="expDesc" required style="width:100%; padding:8px; box-sizing:border-box; height:60px;"></textarea><br/><br/>
+
+      <label>Price (₹):</label><br/>
+      <input type="number" id="expPrice" required style="width:100%; padding:8px; box-sizing:border-box;"><br/><br/>
+
+      <label>Duration (hours):</label><br/>
+      <input type="number" id="expDuration" required style="width:100%; padding:8px; box-sizing:border-box;"><br/><br/>
+
+      <label>Max Participants:</label><br/>
+      <input type="number" id="expMax" required style="width:100%; padding:8px; box-sizing:border-box;"><br/><br/>
+
+      <button type="submit" style="margin-right:10px;">Submit</button>
+      <button onclick="closeExperiencePanel()" style="background:gray; color:white; padding:8px 16px; border:none; border-radius:5px;">Close</button>
+
+    </form>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div id="productModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); ">
+  <div style="background:white; width:90%; max-width:500px; margin:80px auto; padding:30px; border-radius:12px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); position:relative; font-family: 'Merriweather', serif;">
+    <h2 style="margin-bottom: 20px;">Add Product</h2>
+    <form id="productForm">
+      <input type="text" id="prodName" placeholder="Product Name" required
+             style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:6px;" />
+
+      <input type="number" id="prodPrice" placeholder="Price (in ₹)" required
+             style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:6px;" />
+
+      <input type="tel" id="prodContact" placeholder="Contact Number" required
+             style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:6px;" />
+
+      <textarea id="prodDesc" placeholder="Description" rows="4" required
+                style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ccc; border-radius:6px;"></textarea>
+      
+      <label for="prodImage" style="display:block; margin-bottom:6px;">Upload Image:</label>
+      <input type="file" id="prodImage" accept="image/*" style="margin-bottom:10px;" />
+      <img id="previewImg" class="image-preview" style="display:none;" />
+
+      <div style="text-align:right;">
+        <button type="submit"
+                style="background:#006400; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">
+          Add Product
+        </button>
+        <button type="button" onclick="closeProductModal()"
+                style="background:#aaa; color:white; padding:10px 20px; border:none; border-radius:5px; margin-left:10px; cursor:pointer;">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Product Panel -->
+<div id="productPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
+  <div style="background:white; width:90%; max-width:800px; margin:60px auto; padding:20px; border-radius:10px; overflow-y:auto; max-height:90%;">
+    <h2>My Products</h2>
+    <div id="productPanelList"></div>
+    <br/>
+    <button onclick="closeProductPanel()" style="background:gray; color:white; padding:8px 16px; border:none; border-radius:5px;">Close</button>
+  </div>
+</div>
+<!-- Experience Panel -->
+<div id="experiencePanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
+  <div style="background:white; width:90%; max-width:800px; margin:60px auto; padding:20px; border-radius:10px; overflow-y:auto; max-height:90%;">
+    <h2>My Experiences</h2>
+    <div id="ExperiencePanelList"></div>
+    <br/>
+    <button onclick="closeExperiencePanel()" style="background:gray; color:white; padding:8px 16px; border:none; border-radius:5px;">Close</button>
+  </div>
+</div>
+
+<script>
+// Global state
+const vendorProfile = JSON.parse(localStorage.getItem("vendorProfile")) || { name: "Guest", village: "Unknown" };
+const vendorName = vendorProfile.name.toLowerCase();
+
+// On page load
+window.onload = () => {
+  // Update UI
+  document.getElementById("vendorName").innerText = vendorProfile.name;
+  document.getElementById("modalName").innerText = vendorProfile.name;
+  document.getElementById("modalVillage").innerText = vendorProfile.village;
+
+  displayExperiences();
+};
+
+// Dropdown toggle
+function toggleDropdown() {
+  const dropdown = document.getElementById("profileDropdown");
+  dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
+
+// Modals
+function openModal() {
+  document.getElementById("experienceModal").style.display = "block";
+}
+function closeModal() {
+  document.getElementById("experienceModal").style.display = "none";
+}
+function openProductModal() {
+  document.getElementById("productModal").style.display = "block";
+}
+function closeProductModal() {
+  document.getElementById("productModal").style.display = "none";
+  document.getElementById("previewImg").style.display = "none";
+}
+
+// Panels
+function openProductPanel() {
+  document.getElementById("productPanel").style.display = "block";
+  displayProductPanelList();
+}
+function closeProductPanel() {
+  document.getElementById("productPanel").style.display = "none";
+}
+function openExperiencePanel() {
+  document.getElementById("experiencePanel").style.display = "block";
+  displayExperiencePanelList();
+}
+function closeExperiencePanel() {
+  document.getElementById("experiencePanel").style.display = "none";
+}
+
+// Handle image preview
+document.getElementById("prodImage").addEventListener("change", function () {
+  const file = this.files[0];
+  const preview = document.getElementById("previewImg");
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    preview.style.display = "none";
+  }
+});
+
+// Add Experience
+document.getElementById("experienceForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+const experience = {
+  id: Date.now().toString(), // Add unique ID
+  vendor: vendorName,
+  name: document.getElementById("expName").value,
+  desc: document.getElementById("expDesc").value,
+  price: parseInt(document.getElementById("expPrice").value),
+  duration: parseFloat(document.getElementById("expDuration").value),
+  max: parseInt(document.getElementById("expMax").value)
+};
+
+  let experiences = JSON.parse(localStorage.getItem("experiences")) || [];
+  experiences.push(experience);
+  localStorage.setItem("experiences", JSON.stringify(experiences));
+
+  alert("Experience added!");
+  closeModal();
+  this.reset();
+  displayExperiences();
+});
+
+function displayExperiencePanelList() {
+  const container = document.getElementById("ExperiencePanelList");
+  const experiences = JSON.parse(localStorage.getItem("experiences")) || [];
+  const vendorExperiences = experiences.filter(exp => exp.vendor === vendorName);
+
+  container.innerHTML = "";
+  if (vendorExperiences.length === 0) {
+    container.innerHTML = "<p style='font-style:italic;'>No experiences listed yet.</p>";
+    return;
+  }
+
+  vendorExperiences.forEach(exp => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    card.innerHTML = `
+      <div class="product-image" style="background-color:#eaf2e1; width:90px; height:90px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:24px; color:#4a7c59; border:2px solid var(--border-light);">
+        🎯
+      </div>
+      <div class="product-details">
+        <strong style="color:#2d5016; font-size: 16px;">${exp.name}</strong><br/>
+        <b>Price:</b> ₹${exp.price}<br/>
+        <b>Duration:</b> ${exp.duration} hrs<br/>
+        <b>Max Participants:</b> ${exp.max}<br/>
+        <b>Description:</b> ${exp.desc}
+      </div>
+      <button onclick="deleteExperience('${exp.id}')" style="background:#dc3545; color:white; border:none; border-radius:5px; padding:6px 12px; cursor:pointer;">
+        🗑️ Delete
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+//deleteExperience
+function deleteExperience(id) {
+  if (!confirm("Are you sure you want to delete this experience?")) return;
+
+  let experiences = JSON.parse(localStorage.getItem("experiences")) || [];
+  experiences = experiences.filter(exp => exp.id !== id);
+  localStorage.setItem("experiences", JSON.stringify(experiences));
+
+  alert("Experience deleted.");
+  displayExperiencePanelList();
+}
+
+
+// Add Product
+document.getElementById("productForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const file = document.getElementById("prodImage").files[0];
+  const product = {
+    id: Date.now().toString(),
+    vendor: vendorName,
+    name: document.getElementById("prodName").value,
+    price: document.getElementById("prodPrice").value,
+    contact: document.getElementById("prodContact").value,
+    desc: document.getElementById("prodDesc").value,
+    image: null
+  };
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      product.image = e.target.result;
+      saveProduct(product);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    saveProduct(product);
+  }
+});
+
+function saveProduct(product) {
+  let products = JSON.parse(localStorage.getItem("products")) || [];
+  products.push(product);
+  localStorage.setItem("products", JSON.stringify(products));
+
+  alert("Product added!");
+  closeProductModal();
+  document.getElementById("productForm").reset();
+  displayProductPanelList();
+}
+
+// View Product Panel
+function displayProductPanelList() {
+  const container = document.getElementById("productPanelList");
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+  const vendorProducts = products.filter(p => p.vendor === vendorName);
+
+  container.innerHTML = "";
+  if (vendorProducts.length === 0) {
+    container.innerHTML = "<p style='font-style:italic;'>No products listed yet.</p>";
+    return;
+  }
+
+  vendorProducts.forEach(prod => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    const imageHtml = prod.image ?
+      `<img src="${prod.image}" alt="${prod.name}" class="product-image">` :
+      `<div class="product-image" style="background-color:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#666;">📷</div>`;
+
+    card.innerHTML = `
+      ${imageHtml}
+      <div class="product-details">
+        <strong style="color:#006400; font-size: 16px;">${prod.name}</strong><br/>
+        <b>Price:</b> ₹${prod.price}<br/>
+        <b>Contact:</b> ${prod.contact}<br/>
+        <b>Description:</b> ${prod.desc}
+      </div>
+      <button onclick="deleteProduct('${prod.id}')" style="background:#dc3545; color:white; border:none; border-radius:5px; padding:6px 12px; cursor:pointer;">
+        🗑️ Delete
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Delete product
+function deleteProduct(id) {
+  let products = JSON.parse(localStorage.getItem("products")) || [];
+  products = products.filter(p => p.id !== id);
+  localStorage.setItem("products", JSON.stringify(products));
+  alert("Product deleted.");
+  displayProductPanelList();
+}
+
+// Optional: Log experiences to console on load
+function displayExperiences() {
+  const experiences = JSON.parse(localStorage.getItem("experiences")) || [];
+  const vendorExperiences = experiences.filter(exp => exp.vendor === vendorName);
+  console.log("Vendor experiences:", vendorExperiences);
+}
+
+// Logout
+function logout() {
+  localStorage.removeItem("vendorProfile");
+  localStorage.removeItem("experiences");
+  localStorage.removeItem("products");
+  alert("You've been logged out.");
+  window.location.href = "code.html";
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  const dropdown = document.getElementById("profileDropdown");
+  if (!event.target.closest('button') || !event.target.closest('button').onclick?.toString().includes("toggleDropdown")) {
+    dropdown.style.display = "none";
+  }
+});
+</script>
+</body>
+</html>

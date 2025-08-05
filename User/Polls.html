@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPoll | Sustainable Tourism Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <style>
+        .tag {
+            transition: all 0.2s ease;
+        }
+        .tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .active-tab {
+            border-bottom: 3px solid #3b82f6;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-green-50 min-h-screen">
+    <div class="container mx-auto px-4">
+        <!-- Hero Header -->
+        <header class="bg-gradient-to-r from-green-600 to-teal-500 rounded-xl p-8 mb-8 text-white shadow-lg">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e05a02dd-c0ce-4589-8459-9bf09a7748ea.png" alt="EcoPoll logo" class="rounded-full w-10 h-10">
+                        <h1 class="text-3xl font-bold tracking-tight">EcoVote</h1>
+                    </div>
+                    <nav class="flex space-x-4">
+                        <button class="tab-button active-tab px-4 py-2 text-white font-medium rounded-lg bg-white/10 backdrop-blur-sm" data-tab="polls">Polls</button>
+                        <button class="tab-button px-4 py-2 text-white/90 hover:text-white transition-colors" data-tab="reviews">Community</button>
+                    </nav>
+                </div>
+                <div class="mt-12 mb-6">
+                    <h2 class="text-4xl font-bold mb-4">Shape Sustainable Tourism</h2>
+                    <p class="text-lg opacity-90 max-w-2xl">Share your opinion on eco-friendly travel and help destinations become more sustainable</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="bg-white rounded-xl shadow-sm border border-green-100 p-6">
+            <!-- Polls Section -->
+            <section id="polls-section" class="block">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Create or Explore Polls</h2>
+                    <button id="create-poll-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg shadow-sm transition-all">
+                        Create Poll
+                    </button>
+                </div>
+
+                <!-- Create Poll Form -->
+                <div id="create-poll-form" class="hidden mb-8 p-4 border border-gray-200 rounded-lg">
+                    <h3 class="text-lg font-medium mb-4">New Poll</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Question</label>
+                            <input type="text" id="poll-question" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your question">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Options (comma separated)</label>
+                            <input type="text" id="poll-options" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Option 1, Option 2, Option 3">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                            <input type="text" id="poll-tags" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="technology, business, sports">
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button id="cancel-poll" class="px-4 py-2 border border-gray-300 rounded-md">Cancel</button>
+                            <button id="save-poll" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">Save Poll</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="mb-6 flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
+                    <div class="relative flex-grow">
+                        <input type="text" id="search-polls" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search polls...">
+                        <button id="search-btn" class="absolute right-2 top-2 text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <select id="tag-filter" class="appearance-none px-4 py-2 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="">Filter by tag</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Tags -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-700 mb-2">Popular Tags</h3>
+                    <div id="popular-tags" class="flex flex-wrap gap-2">
+                        <!-- Tags will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <!-- Polls List -->
+                <div id="polls-container" class="space-y-4">
+                    <!-- Polls will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Reviews Section -->
+            <section id="reviews-section" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">Reviews</h2>
+                <p class="text-gray-600">Coming soon - Reviews feature will be added in the next update!</p>
+            </section>
+        </main>
+
+        <!-- Poll Modal (for viewing results) -->
+        <div id="poll-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-2xl shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-green-100">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 id="modal-poll-question" class="text-xl font-semibold text-gray-800"></h3>
+                        <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="modal-tags" class="mb-4 flex flex-wrap gap-2"></div>
+                    <div class="chart-container mb-6">
+                        <canvas id="results-chart"></canvas>
+                    </div>
+                    <div id="modal-options" class="mt-6 grid grid-cols-1 gap-4">
+                        <!-- Options will be dynamically inserted here -->
+                    </div>
+                    <div class="mt-4 text-center text-gray-600">
+                        Total votes: <span id="total-votes" class="font-bold"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="mt-16 py-8 border-t border-green-100 text-center text-gray-600">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-center space-x-6 mb-4">
+                    <a href="#" class="hover:text-green-600 transition-colors">About</a>
+                    <a href="#" class="hover:text-green-600 transition-colors">Contact</a>
+                    <a href="#" class="hover:text-green-600 transition-colors">Sustainability Pledge</a>
+                </div>
+                <p class="text-sm">© 2023 EcoVote - Helping create sustainable tourism through community feedback</p>
+            </div>
+        </footer>
+    </div>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+            projectId: "YOUR_PROJECT",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Initialize data storage if not exists
+        if (!localStorage.getItem('polls')) {
+            const initialPolls = [
+                {
+                    id: Date.now() + 2,
+                    question: "How much does sustainability influence your travel destination choices?",
+                    options: ["Greatly influences", "Somewhat influences", "Minimal influence", "No influence"],
+                    votes: [25, 40, 20, 15],
+                    tags: ["tourism", "sustainability", "environment"],
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 3,
+                    question: "Which transportation method do you prefer for sustainable travel?",
+                    options: ["Walking", "Biking", "Public transport", "Carpooling"],
+                    votes: [30, 25, 20, 25],
+                    tags: ["transportation", "eco-friendly", "travel"],
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 4,
+                    question: "What type of accommodation do you choose for sustainable tourism?",
+                    options: ["Eco-lodges", "Green-certified hotels", "Hostels", "Camping"],
+                    votes: [15, 30, 25, 30],
+                    tags: ["accommodation", "sustainability", "travel"],
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 5,
+                    question: "How significant is local culture in shaping your travel experience?",
+                    options: ["Highly significant", "Moderately significant", "Slightly significant", "Not significant"],
+                    votes: [45, 30, 15, 10],
+                    tags: ["culture", "travel", "experience"],
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: Date.now() + 6,
+                    question: "What is your primary concern regarding sustainable tourism?",
+                    options: ["Environmental impact", "Cultural preservation", "Economic benefits", "Wildlife protection"],
+                    votes: [40, 30, 20, 10],
+                    tags: ["concerns", "sustainability", "tourism"],
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('polls', JSON.stringify(initialPolls));
+        }
+
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab-button');
+        const pollsSection = document.getElementById('polls-section');
+        const reviewsSection = document.getElementById('reviews-section');
+        const createPollBtn = document.getElementById('create-poll-btn');
+        const createPollForm = document.getElementById('create-poll-form');
+        const cancelPollBtn = document.getElementById('cancel-poll');
+        const savePollBtn = document.getElementById('save-poll');
+        const searchInput = document.getElementById('search-polls');
+        const searchBtn = document.getElementById('search-btn');
+        const tagFilter = document.getElementById('tag-filter');
+        const popularTagsContainer = document.getElementById('popular-tags');
+        const pollsContainer = document.getElementById('polls-container');
+        const pollModal = document.getElementById('poll-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const modalPollQuestion = document.getElementById('modal-poll-question');
+        const modalTagsContainer = document.getElementById('modal-tags');
+        const totalVotesSpan = document.getElementById('total-votes');
+        let resultsChart = null;
+
+        // Event Listeners
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.toggle('active-tab', t === tab));
+                pollsSection.classList.toggle('hidden', tab.dataset.tab !== 'polls');
+                reviewsSection.classList.toggle('hidden', tab.dataset.tab !== 'reviews');
+            });
+        });
+
+        createPollBtn.addEventListener('click', () => {
+            createPollForm.classList.toggle('hidden');
+            createPollBtn.classList.toggle('hidden');
+        });
+
+        cancelPollBtn.addEventListener('click', () => {
+            createPollForm.classList.add('hidden');
+            createPollBtn.classList.remove('hidden');
+            document.getElementById('poll-question').value = '';
+            document.getElementById('poll-options').value = '';
+            document.getElementById('poll-tags').value = '';
+        });
+
+        savePollBtn.addEventListener('click', savePoll);
+        searchInput.addEventListener('input', filterPolls);
+        searchBtn.addEventListener('click', filterPolls);
+        tagFilter.addEventListener('change', filterPolls);
+        closeModalBtn.addEventListener('click', () => pollModal.classList.add('hidden'));
+        
+        document.getElementById('poll-options').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') savePoll();
+        });
+        
+        document.getElementById('poll-tags').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') savePoll();
+        });
+
+        // Functions
+        function savePoll() {
+            const question = document.getElementById('poll-question').value.trim();
+            const options = document.getElementById('poll-options').value.split(',').map(opt => opt.trim()).filter(opt => opt);
+            const tags = document.getElementById('poll-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+            
+            if (!question || options.length < 2) {
+                alert('Please provide a question and at least 2 options');
+                return;
+            }
+
+            const polls = JSON.parse(localStorage.getItem('polls')) || [];
+            const newPoll = {
+                id: Date.now(),
+                question,
+                options,
+                votes: new Array(options.length).fill(0),
+                tags,
+                createdAt: new Date().toISOString()
+            };
+            
+            polls.push(newPoll);
+            localStorage.setItem('polls', JSON.stringify(polls));
+            
+            // Sync with Firebase
+            database.ref('polls/' + newPoll.id).set(newPoll);
+            
+            // Reset form
+            document.getElementById('poll-question').value = '';
+            document.getElementById('poll-options').value = '';
+            document.getElementById('poll-tags').value = '';
+            createPollForm.classList.add('hidden');
+            createPollBtn.classList.remove('hidden');
+            
+            // Refresh display
+            loadPolls();
+            updateTagFilter();
+            loadPopularTags();
+        }
+
+        function deletePoll(pollId) {
+            if (confirm('Are you sure you want to delete this poll?')) {
+                const polls = JSON.parse(localStorage.getItem('polls')) || [];
+                const updatedPolls = polls.filter(p => p.id !== pollId);
+                localStorage.setItem('polls', JSON.stringify(updatedPolls));
+                
+                // Remove from Firebase
+                database.ref('polls/' + pollId).remove();
+                
+                // Refresh display
+                loadPolls();
+                updateTagFilter();
+                loadPopularTags();
+            }
+        }
+
+        function loadPolls() {
+            pollsContainer.innerHTML = '';
+            const polls = JSON.parse(localStorage.getItem('polls')) || [];
+            
+            polls.forEach(poll => {
+                const pollElement = document.createElement('div');
+                pollElement.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
+                pollElement.dataset.id = poll.id;
+                pollElement.dataset.tags = poll.tags.join(',');
+                
+                const tagsHTML = poll.tags.map(tag => 
+                    `<span class="tag bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">${tag}</span>`
+                ).join('');
+                
+                pollElement.innerHTML = `
+                    <h3 class="font-medium text-lg mb-2">${poll.question}</h3>
+                    <div class="flex flex-wrap gap-2 mb-3">${tagsHTML}</div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-500">${poll.options.length} options</span>
+                        <div class="flex gap-2">
+                            <button class="view-results-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                View Results
+                            </button>
+                            <button class="take-poll-btn bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1 rounded-md text-sm flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Vote Now
+                            </button>
+                            <button class="delete-poll-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                pollsContainer.appendChild(pollElement);
+                
+                // Add event listeners to the new buttons
+                pollElement.querySelector('.view-results-btn').addEventListener('click', () => showResults(poll));
+                pollElement.querySelector('.take-poll-btn').addEventListener('click', () => takePoll(poll));
+                pollElement.querySelector('.delete-poll-btn').addEventListener('click', () => deletePoll(poll.id));
+            });
+        }
+
+        function showResults(poll) {
+            modalPollQuestion.textContent = poll.question;
+            modalTagsContainer.innerHTML = poll.tags.map(tag => 
+                `<span class="tag bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">${tag}</span>`
+            ).join('');
+            
+            totalVotesSpan.textContent = poll.votes.reduce((a, b) => a + b, 0);
+            
+            // Destroy previous chart if exists
+            if (resultsChart) {
+                resultsChart.destroy();
+            }
+            
+            const ctx = document.getElementById('results-chart').getContext('2d');
+            resultsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: poll.options,
+                    datasets: [{
+                        label: 'Votes',
+                        data: poll.votes,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(236, 72, 153, 0.7)',
+                            'rgba(139, 92, 246, 0.7)',
+                            'rgba(20, 184, 166, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            pollModal.classList.remove('hidden');
+        }
+
+        function takePoll(poll) {
+            modalPollQuestion.textContent = poll.question;
+            modalTagsContainer.innerHTML = poll.tags.map(tag => 
+                `<span class="tag bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">${tag}</span>`
+            ).join('');
+            
+            totalVotesSpan.textContent = poll.votes.reduce((a, b) => a + b, 0);
+            
+            // Destroy previous chart if exists
+            if (resultsChart) {
+                resultsChart.destroy();
+            }
+            
+            // Create form for voting
+            const formHTML = `
+                <div id="voting-form" class="space-y-3 mb-4">
+                    ${poll.options.map((option, index) => `
+                        <div class="flex items-center">
+                            <input type="radio" id="option-${index}" name="poll-option" value="${index}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <label for="option-${index}" class="ml-2 text-gray-700">${option}</label>
+                        </div>
+                    `).join('')}
+                </div>
+                <button id="submit-vote" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
+                    Submit Vote
+                </button>
+            `;
+            
+            modalPollQuestion.insertAdjacentHTML('afterend', formHTML);
+            document.getElementById('submit-vote').addEventListener('click', () => vote(poll));
+            
+            pollModal.classList.remove('hidden');
+        }
+
+        function vote(poll) {
+            const selectedOption = document.querySelector('input[name="poll-option"]:checked');
+            if (!selectedOption) {
+                alert('Please select an option');
+                return;
+            }
+            
+            const optionIndex = parseInt(selectedOption.value);
+            const polls = JSON.parse(localStorage.getItem('polls'));
+            const pollIndex = polls.findIndex(p => p.id === poll.id);
+            
+            polls[pollIndex].votes[optionIndex]++;
+            localStorage.setItem('polls', JSON.stringify(polls));
+            
+            // Sync with Firebase
+            database.ref('polls/' + poll.id).set({
+                question: poll.question,
+                options: poll.options,
+                votes: poll.votes,
+                tags: poll.tags,
+                createdAt: poll.createdAt
+            });
+            
+            // Clean up voting form
+            const votingForm = document.getElementById('voting-form');
+            if (votingForm) votingForm.remove();
+            document.getElementById('submit-vote').remove();
+            
+            // Show results
+            showResults(polls[pollIndex]);
+        }
+
+        function filterPolls() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedTag = tagFilter.value;
+            const polls = document.querySelectorAll('#polls-container > div');
+            
+            polls.forEach(poll => {
+                const question = poll.querySelector('h3').textContent.toLowerCase();
+                const tags = poll.dataset.tags.toLowerCase();
+                const matchesSearch = question.includes(searchTerm) || tags.includes(searchTerm);
+                const matchesTag = !selectedTag || poll.dataset.tags.split(',').includes(selectedTag);
+                
+                poll.style.display = (matchesSearch && matchesTag) ? 'block' : 'none';
+            });
+        }
+
+        function updateTagFilter() {
+            const polls = JSON.parse(localStorage.getItem('polls')) || [];
+            const tagsSet = new Set();
+            
+            polls.forEach(poll => {
+                poll.tags.forEach(tag => tagsSet.add(tag));
+            });
+            
+            const tags = Array.from(tagsSet).sort();
+            
+            tagFilter.innerHTML = '<option value="">Filter by tag</option>' + 
+                tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+        }
+
+        function loadPopularTags() {
+            const polls = JSON.parse(localStorage.getItem('polls')) || [];
+            const tagCounts = {};
+            
+            polls.forEach(poll => {
+                poll.tags.forEach(tag => {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                });
+            });
+            
+            const popularTags = Object.entries(tagCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10)
+                .map(entry => entry[0]);
+            
+            popularTagsContainer.innerHTML = popularTags.map(tag => `
+                <button class="tag-btn bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm hover:bg-blue-200" data-tag="${tag}">
+                    ${tag} <span class="text-gray-500 text-xs">(${tagCounts[tag]})</span>
+                </button>
+            `).join('');
+            
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tagFilter.value = btn.dataset.tag;
+                    filterPolls();
+                });
+            });
+        }
+
+        // Initialize
+        loadPolls();
+        updateTagFilter();
+        loadPopularTags();
+        
+        // Listen for real-time updates
+        database.ref('polls').on('value', (snapshot) => {
+            const updatedPolls = snapshot.val();
+            if (updatedPolls) {
+                localStorage.setItem('polls', JSON.stringify(Object.values(updatedPolls)));
+                loadPolls();
+                updateTagFilter();
+                loadPopularTags();
+            }
+        });
+    </script>
+</body>
+</html>

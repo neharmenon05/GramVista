@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rural Sustainability Product Grader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:#f0f0c6f4;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #33563d 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .category-selector {
+            margin-bottom: 30px;
+        }
+
+        .category-selector h3 {
+            color: #2c5530;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .category-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #4a7c59;
+        }
+
+        .category-card.active {
+            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
+            color: white;
+            border-color: #2c5530;
+        }
+
+        .category-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .quiz-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .question-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .question-title {
+            color: #2c5530;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #4a7c59;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
+            color: white;
+            border-color: #2c5530;
+        }
+
+        .option input[type="radio"] {
+            margin: 0;
+            transform: scale(1.2);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #4a7c59 0%, #2c5530 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto;
+            min-width: 200px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .calculate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            margin-top: 30px;
+            animation: bounceIn 0.6s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .grade-display {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .grade-A { color: #28a745; }
+        .grade-B { color: #17a2b8; }
+        .grade-C { color: #ffc107; }
+        .grade-D { color: #fd7e14; }
+        .grade-F { color: #dc3545; }
+
+        .score-bar {
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-out;
+            background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+        }
+
+        .feedback {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .suggestions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .suggestions h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .suggestions ul {
+            color: #856404;
+            padding-left: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .grade-display {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 Rural Sustainability Grader</h1>
+            <p>Assess the environmental impact of everyday rural products</p>
+        </div>
+
+        <div class="content">
+            <div class="category-selector" id="categorySelector">
+                <h3>Choose a product category to evaluate:</h3>
+                <div class="category-grid">
+                    <div class="category-card" data-category="farming-tools">
+                        <span class="category-icon">🚜</span>
+                        <h4>Farming Tools</h4>
+                        <p>Tractors, plows, hand tools</p>
+                    </div>
+                    <div class="category-card" data-category="cooking-fuel">
+                        <span class="category-icon">🔥</span>
+                        <h4>Cooking Fuel</h4>
+                        <p>Wood, gas, solar cookers</p>
+                    </div>
+                    <div class="category-card" data-category="water-storage">
+                        <span class="category-icon">🪣</span>
+                        <h4>Water Storage</h4>
+                        <p>Tanks, wells, containers</p>
+                    </div>
+                    <div class="category-card" data-category="local-food">
+                        <span class="category-icon">🌾</span>
+                        <h4>Local Food</h4>
+                        <p>Grains, vegetables, dairy</p>
+                    </div>
+                    <div class="category-card" data-category="building-materials">
+                        <span class="category-icon">🏠</span>
+                        <h4>Building Materials</h4>
+                        <p>Bricks, wood, cement</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-section" id="quizSection">
+                <div id="questionsContainer"></div>
+                <button class="calculate-btn" id="calculateBtn" disabled>Calculate Sustainability Score</button>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <h3>Your Sustainability Grade</h3>
+                <div class="grade-display" id="gradeDisplay"></div>
+                <div class="score-bar">
+                    <div class="score-fill" id="scoreFill"></div>
+                </div>
+                <div class="feedback" id="feedbackText"></div>
+                <div class="suggestions" id="suggestions"></div>
+                <button class="restart-btn" id="restartBtn">Try Another Product</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            'farming-tools': [
+                {
+                    question: "What type of farming tool are you evaluating?",
+                    options: [
+                        { text: "Manual hand tools (hoe, sickle, spade)", score: 5 },
+                        { text: "Small mechanized tools (tillers, cultivators)", score: 3 },
+                        { text: "Large tractors and heavy machinery", score: 1 },
+                        { text: "Traditional wooden tools", score: 4 }
+                    ]
+                },
+                {
+                    question: "What material is the tool primarily made from?",
+                    options: [
+                        { text: "Locally sourced wood and iron", score: 5 },
+                        { text: "Recycled or refurbished metal", score: 4 },
+                        { text: "New steel and plastic components", score: 2 },
+                        { text: "Imported synthetic materials", score: 1 }
+                    ]
+                },
+                {
+                    question: "How is the tool powered?",
+                    options: [
+                        { text: "Human power only", score: 5 },
+                        { text: "Animal power (oxen, buffalo)", score: 4 },
+                        { text: "Solar or renewable energy", score: 3 },
+                        { text: "Diesel or petrol engine", score: 1 }
+                    ]
+                },
+                {
+                    question: "Where was the tool manufactured or assembled?",
+                    options: [
+                        { text: "Made locally by village craftsmen", score: 5 },
+                        { text: "Made within 50km of my location", score: 4 },
+                        { text: "Made in the same state/region", score: 3 },
+                        { text: "Imported from another country", score: 1 }
+                    ]
+                },
+                {
+                    question: "How long do you expect this tool to last?",
+                    options: [
+                        { text: "More than 20 years with maintenance", score: 5 },
+                        { text: "10-20 years with regular use", score: 4 },
+                        { text: "5-10 years before replacement", score: 3 },
+                        { text: "Less than 5 years", score: 1 }
+                    ]
+                },
+                {
+                    question: "Can this tool be easily repaired locally?",
+                    options: [
+                        { text: "Yes, by local blacksmiths/craftsmen", score: 5 },
+                        { text: "Yes, with basic tools and skills", score: 4 },
+                        { text: "Requires specialized parts/service", score: 2 },
+                        { text: "Not repairable, must be replaced", score: 1 }
+                    ]
+                }
+            ],
+            'cooking-fuel': [
+                {
+                    question: "What type of cooking fuel do you primarily use?",
+                    options: [
+                        { text: "Solar cooker or biogas from farm waste", score: 5 },
+                        { text: "Sustainably harvested firewood", score: 4 },
+                        { text: "LPG gas cylinder", score: 3 },
+                        { text: "Kerosene or coal", score: 1 }
+                    ]
+                },
+                {
+                    question: "Where does your fuel source come from?",
+                    options: [
+                        { text: "Own farm/property (solar, biogas, wood)", score: 5 },
+                        { text: "Local community forest (managed)", score: 4 },
+                        { text: "Regional supplier within 50km", score: 3 },
+                        { text: "Transported from distant locations", score: 1 }
+                    ]
+                },
+                {
+                    question: "How efficient is your cooking method?",
+                    options: [
+                        { text: "Improved cookstove with good ventilation", score: 5 },
+                        { text: "Modern gas stove with automatic ignition", score: 4 },
+                        { text: "Traditional stove but well-maintained", score: 3 },
+                        { text: "Open fire or basic chulah", score: 1 }
+                    ]
+                },
+                {
+                    question: "How do you manage cooking waste and emissions?",
+                    options: [
+                        { text: "Ash used as fertilizer, minimal smoke", score: 5 },
+                        { text: "Proper chimney and waste disposal", score: 4 },
+                        { text: "Some smoke management in place", score: 3 },
+                        { text: "No emission control, indoor pollution", score: 1 }
+                    ]
+                },
+                {
+                    question: "How sustainable is your fuel source?",
+                    options: [
+                        { text: "Renewable (solar) or waste-based (biogas)", score: 5 },
+                        { text: "Replanted wood from managed forests", score: 4 },
+                        { text: "LPG with some recycling programs", score: 3 },
+                        { text: "Non-renewable with no regeneration", score: 1 }
+                    ]
+                },
+                {
+                    question: "What backup cooking method do you have?",
+                    options: [
+                        { text: "Multiple renewable options available", score: 5 },
+                        { text: "Can switch between 2-3 sustainable methods", score: 4 },
+                        { text: "One backup method available", score: 3 },
+                        { text: "No backup, dependent on single source", score: 1 }
+                    ]
+                }
+            ],
+            'water-storage': [
+                {
+                    question: "What type of water storage system do you use?",
+                    options: [
+                        { text: "Traditional earthen pots and clay vessels", score: 5 },
+                        { text: "Concrete tanks with rainwater harvesting", score: 4 },
+                        { text: "Plastic tanks and containers", score: 3 },
+                        { text: "Metal drums or imported containers", score: 2 }
+                    ]
+                },
+                {
+                    question: "What is your primary water source?",
+                    options: [
+                        { text: "Rainwater collection from own roof", score: 5 },
+                        { text: "Community well or borewell", score: 4 },
+                        { text: "Government water supply", score: 3 },
+                        { text: "Water purchased from tankers", score: 1 }
+                    ]
+                },
+                {
+                    question: "How do you treat or purify your stored water?",
+                    options: [
+                        { text: "Natural filtration (sand, charcoal)", score: 5 },
+                        { text: "Solar disinfection or boiling", score: 4 },
+                        { text: "Basic filtration with local materials", score: 3 },
+                        { text: "Chemical treatment or no treatment", score: 1 }
+                    ]
+                },
+                {
+                    question: "Where were your storage containers made?",
+                    options: [
+                        { text: "Made locally by village potters/craftsmen", score: 5 },
+                        { text: "Made within 100km of my location", score: 4 },
+                        { text: "Made in the same state/region", score: 3 },
+                        { text: "Imported from other states/countries", score: 1 }
+                    ]
+                },
+                {
+                    question: "How long do your storage containers last?",
+                    options: [
+                        { text: "More than 15 years with proper care", score: 5 },
+                        { text: "10-15 years of regular use", score: 4 },
+                        { text: "5-10 years before replacement", score: 3 },
+                        { text: "Less than 5 years", score: 1 }
+                    ]
+                },
+                {
+                    question: "What happens to old storage containers?",
+                    options: [
+                        { text: "Repurposed for other uses on farm", score: 5 },
+                        { text: "Returned to earth (clay) or recycled", score: 4 },
+                        { text: "Sold to scrap dealers for recycling", score: 3 },
+                        { text: "Thrown away as waste", score: 1 }
+                    ]
+                }
+            ],
+            'local-food': [
+                {
+                    question: "What type of food are you evaluating?",
+                    options: [
+                        { text: "Traditional grains grown on own farm", score: 5 },
+                        { text: "Organic vegetables from local farmers", score: 4 },
+                        { text: "Regional produce from nearby markets", score: 3 },
+                        { text: "Packaged food from distant suppliers", score: 1 }
+                    ]
+                },
+                {
+                    question: "How far did this food travel to reach you?",
+                    options: [
+                        { text: "Grown on my own land (0km)", score: 5 },
+                        { text: "From neighboring farms (under 10km)", score: 4 },
+                        { text: "Local market within 50km", score: 3 },
+                        { text: "Transported over 200km", score: 1 }
+                    ]
+                },
+                {
+                    question: "What farming methods were used?",
+                    options: [
+                        { text: "Traditional organic with natural fertilizers", score: 5 },
+                        { text: "Mixed farming with minimal chemicals", score: 4 },
+                        { text: "Conventional farming with some chemicals", score: 3 },
+                        { text: "Intensive farming with heavy pesticide use", score: 1 }
+                    ]
+                },
+                {
+                    question: "How is the food packaged or stored?",
+                    options: [
+                        { text: "No packaging, stored in traditional containers", score: 5 },
+                        { text: "Minimal packaging with natural materials", score: 4 },
+                        { text: "Some plastic packaging for freshness", score: 3 },
+                        { text: "Multiple layers of plastic and synthetic packaging", score: 1 }
+                    ]
+                },
+                {
+                    question: "What water source was used for growing?",
+                    options: [
+                        { text: "Rainwater and natural irrigation", score: 5 },
+                        { text: "Well water from sustainable sources", score: 4 },
+                        { text: "River or canal water", score: 3 },
+                        { text: "Groundwater from deep borewells", score: 2 }
+                    ]
+                },
+                {
+                    question: "How seasonal and local is this food?",
+                    options: [
+                        { text: "Seasonal crop native to this region", score: 5 },
+                        { text: "Regional variety grown at right time", score: 4 },
+                        { text: "Common crop but some seasonal mismatch", score: 3 },
+                        { text: "Exotic variety requiring special conditions", score: 1 }
+                    ]
+                }
+            ],
+            'building-materials': [
+                {
+                    question: "What building material are you evaluating?",
+                    options: [
+                        { text: "Adobe/mud bricks made on-site", score: 5 },
+                        { text: "Local stone and timber", score: 4 },
+                        { text: "Fired bricks from local kilns", score: 3 },
+                        { text: "Cement and steel from industrial suppliers", score: 1 }
+                    ]
+                },
+                {
+                    question: "Where do these materials come from?",
+                    options: [
+                        { text: "From my own land (clay, stone, bamboo)", score: 5 },
+                        { text: "Local quarries and forests within 25km", score: 4 },
+                        { text: "Regional suppliers within 100km", score: 3 },
+                        { text: "Transported from other states/far distances", score: 1 }
+                    ]
+                },
+                {
+                    question: "How energy-intensive is the production process?",
+                    options: [
+                        { text: "Sun-dried, no industrial processing", score: 5 },
+                        { text: "Minimal processing with traditional methods", score: 4 },
+                        { text: "Some kiln firing or basic processing", score: 3 },
+                        { text: "High-temperature industrial manufacturing", score: 1 }
+                    ]
+                },
+                {
+                    question: "How durable are these materials?",
+                    options: [
+                        { text: "Lasts 50+ years with maintenance", score: 5 },
+                        { text: "Good durability for 25-50 years", score: 4 },
+                        { text: "Adequate for 10-25 years", score: 3 },
+                        { text: "Needs frequent replacement (under 10 years)", score: 1 }
+                    ]
+                },
+                {
+                    question: "How do these materials perform in local climate?",
+                    options: [
+                        { text: "Perfectly suited - provides natural cooling/warmth", score: 5 },
+                        { text: "Well-adapted to local weather conditions", score: 4 },
+                        { text: "Adequate performance with some adaptation", score: 3 },
+                        { text: "Requires artificial climate control", score: 1 }
+                    ]
+                },
+                {
+                    question: "What happens to these materials at end of life?",
+                    options: [
+                        { text: "Returns to earth naturally (biodegradable)", score: 5 },
+                        { text: "Can be reused for other construction", score: 4 },
+                        { text: "Partially recyclable with processing", score: 3 },
+                        { text: "Becomes permanent waste", score: 1 }
+                    ]
+                }
+            ]
+        };
+
+        const gradeMessages = {
+            'A': { 
+                text: "Excellent! You're making highly sustainable choices that benefit both the environment and your local community.", 
+                emoji: "🌟",
+                suggestions: [
+                    "Share your sustainable practices with neighbors",
+                    "Consider teaching others about eco-friendly alternatives",
+                    "Look into community-wide sustainability initiatives"
+                ]
+            },
+            'B': { 
+                text: "Great work! Your choices show strong environmental consciousness with room for minor improvements.", 
+                emoji: "👍",
+                suggestions: [
+                    "Research local alternatives for any non-local materials",
+                    "Consider upgrading to more durable options when replacing items",
+                    "Look into community bulk purchasing for better sustainability"
+                ]
+            },
+            'C': { 
+                text: "Good start! You're on the right track but there are several areas where you can make more sustainable choices.", 
+                emoji: "✅",
+                suggestions: [
+                    "Prioritize locally-made products when possible",
+                    "Consider repair and reuse before buying new items",
+                    "Look into traditional alternatives that might be more sustainable"
+                ]
+            },
+            'D': { 
+                text: "There's significant room for improvement. Small changes can make a big difference for the environment.", 
+                emoji: "⚠️",
+                suggestions: [
+                    "Start with one category and focus on local alternatives",
+                    "Connect with local artisans and producers",
+                    "Learn about traditional sustainable practices in your area"
+                ]
+            },
+            'F': { 
+                text: "Your current choices have high environmental impact. Consider exploring more sustainable alternatives.", 
+                emoji: "❌",
+                suggestions: [
+                    "Research local and traditional alternatives to current products",
+                    "Start small - replace one item at a time with sustainable options",
+                    "Connect with environmental groups in your area for guidance"
+                ]
+            }
+        };
+
+        let currentCategory = '';
+        let answers = {};
+
+        // Category selection
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove active class from all cards
+                document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+                // Add active class to clicked card
+                card.classList.add('active');
+                
+                currentCategory = card.dataset.category;
+                showQuiz();
+            });
+        });
+
+        function showQuiz() {
+            document.getElementById('categorySelector').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+            
+            const questionsContainer = document.getElementById('questionsContainer');
+            questionsContainer.innerHTML = '';
+            
+            questions[currentCategory].forEach((q, index) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                
+                const optionsHtml = q.options.map((option, optionIndex) => `
+                    <label class="option" for="q${index}_${optionIndex}">
+                        <input type="radio" id="q${index}_${optionIndex}" name="question_${index}" value="${option.score}" />
+                        <span>${option.text}</span>
+                    </label>
+                `).join('');
+                
+                questionCard.innerHTML = `
+                    <h4 class="question-title">${q.question}</h4>
+                    <div class="options">
+                        ${optionsHtml}
+                    </div>
+                `;
+                
+                questionsContainer.appendChild(questionCard);
+            });
+            
+            // Add event listeners for options
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // Remove selected class from siblings
+                    const siblings = option.parentElement.querySelectorAll('.option');
+                    siblings.forEach(s => s.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    option.classList.add('selected');
+                    
+                    checkAllAnswered();
+                });
+            });
+        }
+
+        function checkAllAnswered() {
+            const totalQuestions = questions[currentCategory].length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            
+            const calculateBtn = document.getElementById('calculateBtn');
+            if (answeredQuestions === totalQuestions) {
+                calculateBtn.disabled = false;
+            } else {
+                calculateBtn.disabled = true;
+            }
+        }
+
+        document.getElementById('calculateBtn').addEventListener('click', calculateScore);
+
+        function calculateScore() {
+            let totalScore = 0;
+            let maxScore = 0;
+            
+            questions[currentCategory].forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="question_${index}"]:checked`);
+                if (selectedOption) {
+                    totalScore += parseInt(selectedOption.value);
+                }
+                maxScore += 5; // Maximum score per question
+            });
+            
+            const percentage = (totalScore / maxScore) * 100;
+            const grade = getGrade(percentage);
+            
+            // Store result in localStorage
+            const result = {
+                category: currentCategory,
+                score: totalScore,
+                maxScore: maxScore,
+                percentage: percentage,
+                grade: grade,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('lastSustainabilityResult', JSON.stringify(result));
+            
+            showResult(grade, percentage, totalScore, maxScore);
+        }
+
+        function getGrade(percentage) {
+            if (percentage >= 90) return 'A';
+            if (percentage >= 80) return 'B';
+            if (percentage >= 70) return 'C';
+            if (percentage >= 60) return 'D';
+            return 'F';
+        }
+
+        function showResult(grade, percentage, score, maxScore) {
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            const gradeDisplay = document.getElementById('gradeDisplay');
+            gradeDisplay.textContent = `${grade} ${gradeMessages[grade].emoji}`;
+            gradeDisplay.className = `grade-display grade-${grade}`;
+            
+            const scoreFill = document.getElementById('scoreFill');
+            setTimeout(() => {
+                scoreFill.style.width = `${percentage}%`;
+            }, 300);
+            
+            const feedbackText = document.getElementById('feedbackText');
+            feedbackText.innerHTML = `
+                <h4>Score: ${score}/${maxScore} (${Math.round(percentage)}%)</h4>
+                <p>${gradeMessages[grade].text}</p>
+            `;
+            
+            const suggestions = document.getElementById('suggestions');
+            suggestions.innerHTML = `
+                <h4>💡 Suggestions for Improvement:</h4>
+                <ul>
+                    ${gradeMessages[grade].suggestions.map(s => `<li>${s}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            currentCategory = '';
+            answers = {};
+            
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('categorySelector').style.display = 'block';
+            
+            // Reset category selection
+            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+            
+            // Reset calculate button
+            document.getElementById('calculateBtn').disabled = true;
+        });
+
+        // Load previous result on page load
+        window.addEventListener('load', () => {
+            const savedResult = localStorage.getItem('lastSustainabilityResult');
+            if (savedResult) {
+                const result = JSON.parse(savedResult);
+                const timeDiff = Date.now() - new Date(result.timestamp).getTime();
+                const hoursDiff = timeDiff / (1000 * 60 * 60);
+                
+                // Show saved result if it's less than 24 hours old
+                if (hoursDiff < 24) {
+                    const banner = document.createElement('div');
+                    banner.style.cssText = `
+                        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+                        color: white;
+                        padding: 15px;
+                        text-align: center;
+                        margin-bottom: 20px;
+                        border-radius: 10px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    `;
+                    banner.innerHTML = `
+                        <strong>Previous Result:</strong> You scored ${result.grade} (${Math.round(result.percentage)}%) 
+                        for ${result.category.replace('-', ' ')} ${Math.round(hoursDiff)} hours ago. 
+                        <br><small>Click to view details</small>
+                    `;
+                    
+                    banner.addEventListener('click', () => {
+                        currentCategory = result.category;
+                        showResult(result.grade, result.percentage, result.score, result.maxScore);
+                    });
+                    
+                    banner.addEventListener('mouseenter', () => {
+                        banner.style.transform = 'translateY(-2px)';
+                        banner.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+                    });
+                    
+                    banner.addEventListener('mouseleave', () => {
+                        banner.style.transform = 'translateY(0)';
+                        banner.style.boxShadow = 'none';
+                    });
+                    
+                    document.querySelector('.content').insertBefore(banner, document.getElementById('categorySelector'));
+                }
+            }
+        });
+
+        // Add some interactive animations
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                if (!card.classList.contains('active')) {
+                    card.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        });
+
+        // Add progress indicator
+        function updateProgress() {
+            const totalQuestions = questions[currentCategory] ? questions[currentCategory].length : 0;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            
+            let progressBar = document.getElementById('progressBar');
+            if (!progressBar && totalQuestions > 0) {
+                progressBar = document.createElement('div');
+                progressBar.id = 'progressBar';
+                progressBar.style.cssText = `
+                    background: #e9ecef;
+                    height: 6px;
+                    border-radius: 3px;
+                    margin: 20px 0;
+                    overflow: hidden;
+                `;
+                
+                const progressFill = document.createElement('div');
+                progressFill.id = 'progressFill';
+                progressFill.style.cssText = `
+                    background: linear-gradient(90deg, #4a7c59 0%, #2c5530 100%);
+                    height: 100%;
+                    width: 0%;
+                    transition: width 0.3s ease;
+                `;
+                
+                progressBar.appendChild(progressFill);
+                document.getElementById('questionsContainer').insertBefore(progressBar, document.getElementById('questionsContainer').firstChild);
+            }
+            
+            if (progressBar) {
+                const progressFill = document.getElementById('progressFill');
+                const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+                progressFill.style.width = `${progressPercentage}%`;
+                
+                // Add progress text
+                let progressText = document.getElementById('progressText');
+                if (!progressText) {
+                    progressText = document.createElement('div');
+                    progressText.id = 'progressText';
+                    progressText.style.cssText = `
+                        text-align: center;
+                        font-size: 0.9em;
+                        color: #6c757d;
+                        margin-bottom: 10px;
+                    `;
+                    progressBar.parentNode.insertBefore(progressText, progressBar);
+                }
+                progressText.textContent = `Progress: ${answeredQuestions}/${totalQuestions} questions completed`;
+            }
+        }
+
+        // Update the checkAllAnswered function to include progress
+        function checkAllAnswered() {
+            const totalQuestions = questions[currentCategory].length;
+            const answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
+            
+            const calculateBtn = document.getElementById('calculateBtn');
+            if (answeredQuestions === totalQuestions) {
+                calculateBtn.disabled = false;
+                calculateBtn.textContent = '🌱 Calculate My Sustainability Score';
+            } else {
+                calculateBtn.disabled = true;
+                calculateBtn.textContent = `Answer ${totalQuestions - answeredQuestions} more questions`;
+            }
+            
+            updateProgress();
+        }
+
+        // Add tooltip functionality
+        function addTooltips() {
+            const tooltipData = {
+                'farming-tools': 'Traditional and locally-made tools typically have lower environmental impact',
+                'cooking-fuel': 'Renewable energy sources and efficient stoves reduce carbon footprint',
+                'water-storage': 'Clay and locally-made containers are more sustainable than plastic',
+                'local-food': 'Locally grown seasonal food has minimal transportation impact',
+                'building-materials': 'Natural materials from local sources are most sustainable'
+            };
+            
+            document.querySelectorAll('.category-card').forEach(card => {
+                const category = card.dataset.category;
+                card.title = tooltipData[category];
+            });
+        }
+
+        // Initialize tooltips on page load
+        window.addEventListener('load', addTooltips);
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('resultSection').style.display === 'block') {
+                    document.getElementById('restartBtn').click();
+                }
+            }
+            
+            if (e.key === 'Enter') {
+                const calculateBtn = document.getElementById('calculateBtn');
+                if (!calculateBtn.disabled && calculateBtn.style.display !== 'none') {
+                    calculateBtn.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

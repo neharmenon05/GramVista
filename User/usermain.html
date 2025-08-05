@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Village User Dashboard</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Video Background */
+.video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.video-background video {
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+}
+
+/* Enhanced video overlay with improved background */
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f0f0c6f4 0%, #e8e8b8f4 50%, #f0f0c6f4 100%);
+    z-index: -1;
+    backdrop-filter: blur(2px);
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 60px;
+    color: white;
+}
+
+.dashboard-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.7);
+    animation: fadeInUp 1s ease-out;
+    background: linear-gradient(45deg, #2d5016, #4a7c23, #2d5016);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease-in-out infinite, fadeInUp 1s ease-out;
+}
+
+.dashboard-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease-out 0.2s both;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+    color: #2d5016;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    margin-top: 50px;
+    perspective: 1000px;
+}
+
+/* Enhanced tile background with improved colors */
+.time-card {
+    background: linear-gradient(135deg, #2d5016 0%, #1f3a0f 50%, #2d5016 100%);
+    backdrop-filter: blur(25px);
+    border-radius: 25px;
+    padding: 35px;
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    animation: slideInUp 0.8s ease-out both;
+    transform-style: preserve-3d;
+    box-shadow: 0 15px 40px rgba(45, 80, 22, 0.3);
+}
+
+.time-card:nth-child(1) { animation-delay: 0.1s; }
+.time-card:nth-child(2) { animation-delay: 0.2s; }
+.time-card:nth-child(3) { animation-delay: 0.3s; }
+.time-card:nth-child(4) { animation-delay: 0.4s; }
+.time-card:nth-child(5) { animation-delay: 0.5s; }
+.time-card:nth-child(6) { animation-delay: 0.6s; }
+.time-card:nth-child(7) { animation-delay: 0.7s; }
+
+.time-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(144, 238, 144, 0.3), transparent);
+    transition: left 0.8s ease;
+    z-index: 1;
+}
+
+.time-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(144, 238, 144, 0.1) 50%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 25px;
+}
+
+/* Enhanced hover effect with lighter green */
+.time-card:hover {
+    transform: translateY(-20px) rotateX(10deg) rotateY(5deg) scale(1.05);
+    background: linear-gradient(135deg, #5a8f3a 0%, #7db356 50%, #5a8f3a 100%);
+    box-shadow: 0 30px 60px rgba(90, 143, 58, 0.4);
+    border-color: rgba(144, 238, 144, 0.6);
+}
+
+.time-card:hover::before {
+    left: 100%;
+}
+
+.time-card:hover::after {
+    opacity: 1;
+}
+
+.card-inner {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.4s ease;
+}
+
+.time-card:hover .card-inner {
+    transform: translateZ(20px);
+}
+
+/* Enhanced icon styling */
+.card-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 25px;
+    background: linear-gradient(135deg, #2d5016, #4a7c23);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    transition: all 0.6s ease;
+    box-shadow: 0 15px 30px rgba(45, 80, 22, 0.4);
+    position: relative;
+    color: #90EE90;
+}
+
+.card-icon::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg, #5a8f3a, #7db356, #90EE90, #5a8f3a);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    animation: rotate 2s linear infinite;
+}
+
+.time-card:hover .card-icon {
+    transform: rotateY(180deg) scale(1.15);
+    background: linear-gradient(135deg, #5a8f3a, #7db356);
+    box-shadow: 0 20px 40px rgba(144, 238, 144, 0.6);
+    color: white;
+}
+
+.time-card:hover .card-icon::before {
+    opacity: 1;
+}
+
+.card-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+    transition: all 0.3s ease;
+}
+
+.time-card:hover .card-title {
+    color: #90EE90;
+    transform: translateY(-5px);
+    text-shadow: 0 4px 8px rgba(0,0,0,0.8);
+}
+
+.card-description {
+    color: rgba(255, 255, 255, 0.95);
+    text-align: center;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.time-card:hover .card-description {
+    color: white;
+    transform: translateY(-3px);
+}
+
+/* Enhanced card time styling */
+.card-time {
+    background: linear-gradient(135deg, rgba(118, 215, 53, 0.4), rgba(136, 249, 70, 0.4));
+    padding: 12px 20px;
+    border-radius: 25px;
+    color: white;
+    font-size: 0.95rem;
+    text-align: center;
+    font-weight: 600;
+    margin-top: auto;
+    border: 1px solid rgba(144, 238, 144, 0.3);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(15px);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.time-card:hover .card-time {
+    background: linear-gradient(135deg, rgba(90, 143, 58, 0.6), rgba(125, 179, 86, 0.6));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(144, 238, 144, 0.3);
+    border-color: rgba(144, 238, 144, 0.6);
+}
+
+/* Enhanced button styling */
+.card-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.card-buttons button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #17290b, #4a7c23);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(45, 80, 22, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-buttons button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(121, 227, 121, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.card-buttons button:hover {
+    background: linear-gradient(135deg, #2c451d, #7db356);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(90, 143, 58, 0.4);
+}
+
+.card-buttons button:hover::before {
+    left: 100%;
+}
+
+.card-buttons button:active {
+    transform: translateY(0);
+}
+
+/* Video Controls (optional) */
+.video-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+}
+
+.video-control-btn {
+    background: rgba(45, 80, 22, 0.8);
+    border: 1px solid rgba(144, 238, 144, 0.3);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.video-control-btn:hover {
+    background: rgba(90, 143, 58, 0.9);
+    transform: translateY(-2px);
+    border-color: rgba(144, 238, 144, 0.6);
+}
+
+/* Loading overlay with enhanced styling */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(45, 80, 22, 0.95), rgba(90, 143, 58, 0.95));
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(10px);
+}
+
+.loading-spinner {
+    width: 80px;
+    height: 80px;
+    border: 4px solid rgba(144, 238, 144, 0.3);
+    border-top: 4px solid #90EE90;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Enhanced fallback background */
+.fallback-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #8ef586 0%, #3cf858 50%, #60fa52 100%);
+    z-index: -3;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(80px) rotateX(-10deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+    }
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@media (max-width: 768px) {
+    .dashboard-title {
+        font-size: 2.5rem;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .time-card {
+        padding: 25px;
+    }
+
+    .time-card:hover {
+        transform: translateY(-10px) scale(1.02);
+    }
+
+    .video-controls {
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .video-control-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    .card-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .card-buttons button {
+        width: 100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Fallback background -->
+    <div class="fallback-background"></div>
+
+    
+    <!-- Video Background -->
+    <div class="video-background">
+        <video id="backgroundVideo" autoplay muted loop playsinline>
+           <!--<source src="..\photos\village.mp4" type="video/mp4">--> 
+            <!-- Add your video URL here -->
+        </video>
+    </div> 
+
+    <!-- Video overlay for better readability -->
+    <div class="video-overlay"></div>
+
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">User's Dashboard</h1>
+            <p class="dashboard-subtitle">Explore our digital village services</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="time-card" onclick="navigateToPage('BankApplication')">
+                <div class="card-inner">
+                    <div class="card-icon">🏦</div>
+                    <h3 class="card-title">Bank Application</h3>
+                    <p class="card-description">Empowering Rural Tourism Through Fair Revenue Distribution</p>
+                    <div class="card-time">Bank Now</div>
+                </div>
+            </div>
+            <div class="time-card" onclick="navigateToPage('Bookings')">
+                <div class="card-inner">
+                    <div class="card-icon">⚙️</div>
+                    <h3 class="card-title">Services</h3>
+                    <p class="card-description">Discover comprehensive village services from agriculture consulting to traditional crafts and local expertise.</p>
+                    <div class="card-time">Business Hours</div>
+                </div>
+            </div>
+                        <div class="time-card" onclick="navigateToPage('Women Safety')">
+                <div class="card-inner">
+                    <div class="card-icon">🚺</div>
+                    <h3 class="card-title">SheSecure</h3>
+                    <p class="card-description">An application that offers you services that ensure your safety and well-being.</p>
+                    <div class="card-time">Real-time Processing</div>
+                </div>
+            </div> 
+            <div class="time-card" onclick="navigateToPage('Marketplace')">
+                <div class="card-inner">
+                    <div class="card-icon">🛒</div>
+                    <h3 class="card-title">Marketplace</h3>
+                    <p class="card-description">Buy local products and handicrafts through our marketplace.</p>
+                    <div class="card-time">Buy Now</div>
+                </div>
+            </div>
+
+             <div class="time-card" onclick="navigateToPage('duolingo')">
+                <div class="card-inner">
+                    <div class="card-icon">🌍</div>
+                    <h3 class="card-title">Language Learning</h3>
+                    <p class="card-description">Master local dialects and global languages while preserving our village's linguistic heritage.</p>
+                    <div class="card-time">Learn Anytime</div>
+                </div>
+            </div>
+            <div class="time-card" onclick="navigateToPage('itinerary')">
+                <div class="card-inner">
+                    <div class="card-icon">🗺️</div>
+                    <h3 class="card-title">Travel Itinerary</h3>
+                    <p class="card-description">Plan village tours, explore local attractions, and discover hidden gems in our beautiful countryside.</p>
+                    <div class="card-time">Trip Planning</div>
+                </div>
+            </div>
+            <div class="time-card" onclick="navigateToPage('storytelling')">
+                <div class="card-inner">
+                    <div class="card-icon">📚</div>
+                    <h3 class="card-title">Story Telling</h3>
+                    <p class="card-description">Immerse yourself in captivating village tales and interactive storytelling experiences that bring our community to life.</p>
+                    <div class="card-time">Available 24/7</div>
+                </div>
+            </div>
+            <div class="time-card" onclick="navigateToPage('digital-twin')">
+                <div class="card-inner">
+                    <div class="card-icon">🤖</div>
+                    <h3 class="card-title">Digital Twin</h3>
+                    <p class="card-description">Experience our village through cutting-edge digital twin technology for virtual exploration and planning.</p>
+                    <div class="card-time">Advanced Tech</div>
+                </div>
+            </div>   
+            <div class="time-card">
+            <div class="card-inner">
+                <div class="card-icon">📊</div>
+                <h3 class="card-title">Polls & Reviews</h3>
+                <p class="card-description">
+                    Engage your audience through polls and gather feedback.<br>
+                    Explore reviews to make informed decisions based on real experiences.
+                </p>
+                <div class="card-time">Feedback and Analytics</div>
+                <div class="card-buttons">
+                    <button onclick="navigateToPage('Polls')">Go to Polls</button>
+                    <button onclick="navigateToPage('Reviews')">Go to Reviews</button>
+                </div>
+            </div>
+            </div>
+        </div>
+<div id="chatbot-panel" style="
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  width: 400px;
+  height: 500px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  display: none;
+  background: white;
+  z-index: 9999;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+">
+  <!-- Fullscreen Toggle Button (INSIDE the panel) -->
+  <button onclick="toggleFullscreen()" style="
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #132710;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 10001;
+  ">
+    ⛶
+  </button>
+
+  <!-- Chatbot Iframe -->
+  <iframe 
+    id="chatbot-iframe"
+    src="DrSaab.html" 
+    width="100%" 
+    height="100%" 
+    style="border: none; border-radius: 10px;">
+  </iframe>
+</div>
+
+<!-- Floating Chatbot Button -->
+<button onclick="toggleChatbot()" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #132710;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+">
+  💬
+</button>
+
+    <script>
+        // Video control functions
+        let isPlaying = true;
+        let isMuted = true;
+
+        function togglePlay() {
+            const video = document.getElementById('backgroundVideo');
+            if (isPlaying) {
+                video.pause();
+                isPlaying = false;
+            } else {
+                video.play();
+                isPlaying = true;
+            }
+        }
+
+        function toggleMute() {
+            const video = document.getElementById('backgroundVideo');
+            video.muted = !video.muted;
+            isMuted = video.muted;
+            
+            // Update button text
+            const muteBtn = document.querySelector('.video-control-btn:last-child');
+            muteBtn.textContent = isMuted ? '🔊' : '🔇';
+        }
+
+        // Enhanced navigation with loading animation
+        function navigateToPage(page) {
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex';
+            
+            // Add page transition effect
+            document.body.style.transition = 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            document.body.style.transform = 'scale(0.95)';
+            
+            // Page URLs mapping
+            const pages = {
+                'storytelling': 'strory_index.html',
+                'Bookings': 'booking.html',
+                'Women Safety': ' http://localhost:4000/',    
+                'duolingo': 'languageLearner.html',
+                'itinerary': 'itenary.html',
+                'digital-twin': 'http://127.0.0.1:5000',
+                'Marketplace': 'place.html',
+                'Polls': 'Polls.html',
+                'Reviews':'Reviews.html',
+                'BankApplication': ' http://localhost:5173/'
+            };
+            
+            // Simulate loading and navigate
+            setTimeout(() => {
+                // Replace this with actual navigation
+                window.location.href = pages[page];
+                
+                // For demo purposes (remove in production)
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                    document.body.style.transform = 'scale(1)';
+                    alert(`Navigating to ${page.charAt(0).toUpperCase() + page.slice(1)} page...`);
+                }, 1000);
+            }, 1200);
+        }
+
+        // Enhanced card interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.time-card');
+            
+            cards.forEach(card => {
+                // 3D tilt effect on mouse move
+                card.addEventListener('mousemove', function(e) {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 10;
+                    const rotateY = (centerX - x) / 10;
+                    
+                    card.style.transform = `
+                        translateY(-20px) 
+                        rotateX(${rotateX}deg) 
+                        rotateY(${rotateY}deg) 
+                        scale(1.05)
+                    `;
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    card.style.transform = '';
+                });
+                
+                // Enhanced click effect
+                card.addEventListener('click', function(e) {
+                    // Create multiple ripples
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const ripple = document.createElement('div');
+                            const rect = card.getBoundingClientRect();
+                            const size = Math.max(rect.width, rect.height) * (1 + i * 0.2);
+                            const x = e.clientX - rect.left - size / 2;
+                            const y = e.clientY - rect.top - size / 2;
+                            
+                            ripple.style.cssText = `
+                                position: absolute;
+                                width: ${size}px;
+                                height: ${size}px;
+                                left: ${x}px;
+                                top: ${y}px;
+                                background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
+                                border-radius: 50%;
+                                transform: scale(0);
+                                animation: enhancedRipple 1s ease-out;
+                                pointer-events: none;
+                                z-index: 10;
+                            `;
+                            
+                            card.appendChild(ripple);
+                            
+                            setTimeout(() => {
+                                ripple.remove();
+                            }, 1000);
+                        }, i * 100);
+                    }
+                });
+            });
+            
+            // Add enhanced ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes enhancedRipple {
+                    0% {
+                        transform: scale(0);
+                        opacity: 1;
+                    }
+                    50% {
+                        opacity: 0.6;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Video error handling
+            const video = document.getElementById('backgroundVideo');
+            video.addEventListener('error', function() {
+                console.log('Video failed to load, showing fallback background');
+                document.querySelector('.video-background').style.display = 'none';
+            });
+
+            // Video loaded successfully
+            video.addEventListener('loadeddata', function() {
+                console.log('Video loaded successfully');
+                document.querySelector('.fallback-background').style.display = 'none';
+            });
+        });
+
+        // Parallax effect for video (subtle)
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const video = document.getElementById('backgroundVideo');
+            const speed = scrolled * 0.2;
+            
+            video.style.transform = `translate(-50%, -50%) translateY(${speed}px)`;
+        });
+
+        // Add floating particles on mouse interaction
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() > 0.95) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 6px;
+                    height: 6px;
+                    background: radial-gradient(circle, #FFD700, transparent);
+                    border-radius: 50%;
+                    left: ${e.clientX}px;
+                    top: ${e.clientY}px;
+                    pointer-events: none;
+                    animation: floatUp 2s ease-out forwards;
+                    z-index: 1000;
+                `;
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 2000);
+            }
+        });
+
+        
+        function toggleChatbot() {
+            const panel = document.getElementById('chatbot-panel');
+            const isVisible = panel.style.display === 'block';
+            panel.style.display = isVisible ? 'none' : 'block';
+        }
+        // Add floating particle animation
+        const particleStyle = document.createElement('style');
+        particleStyle.textContent = `
+            @keyframes floatUp {
+                0% {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100px) scale(0);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(particleStyle);
+
+                document.addEventListener('keydown', function(e) {                      
+            // Escape to close chatbot
+            if (e.key === 'Escape') {
+                document.getElementById('chatbot-panel').style.display = 'none';
+            }
+        });
+        let isFullscreen = false;
+
+function toggleChatbot() {
+  const panel = document.getElementById('chatbot-panel');
+  panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+}
+
+function toggleFullscreen() {
+  const panel = document.getElementById('chatbot-panel');
+  const iframe = document.getElementById('chatbot-iframe');
+
+  if (!isFullscreen) {
+    panel.style.top = '0';
+    panel.style.left = '0';
+    panel.style.right = '0';
+    panel.style.bottom = '0';
+    panel.style.width = '100vw';
+    panel.style.height = '100vh';
+    panel.style.borderRadius = '0';
+    iframe.style.borderRadius = '0';
+  } else {
+    panel.style.top = '';
+    panel.style.left = '';
+    panel.style.right = '20px';
+    panel.style.bottom = '70px';
+    panel.style.width = '400px';
+    panel.style.height = '500px';
+    panel.style.borderRadius = '10px';
+    iframe.style.borderRadius = '10px';
+  }
+
+  isFullscreen = !isFullscreen;
+}
+        </script>
+</body>
+</html>

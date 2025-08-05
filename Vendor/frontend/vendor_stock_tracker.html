@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Inventory Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .vendor-group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .vendor-group h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .stock-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .stock-high { background: #d4edda; color: #155724; }
+        .stock-medium { background: #fff3cd; color: #856404; }
+        .stock-low { background: #f8d7da; color: #721c24; }
+
+        .hidden {
+            display: none;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-filter input, .search-filter select {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Vendor SInventory Manager</h1>
+            <p>Manage your inventory across multiple vendors</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">Dashboard</button>
+            <button class="tab" onclick="showTab('add-product')">Add Product</button>
+            <button class="tab" onclick="showTab('inventory')">Inventory</button>
+            <button class="tab" onclick="showTab('vendors')">Vendors</button>
+        </div>
+
+        <div class="content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="total-products">0</h3>
+                        <p>Total Products</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="total-vendors">0</h3>
+                        <p>Active Vendors</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="low-stock">0</h3>
+                        <p>Low Stock Items</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="total-value">₹0</h3>
+                        <p>Total Inventory Value</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h2 style="padding: 20px; margin: 0; background: #f8f9fa; border-bottom: 1px solid #e9ecef;">Recent Activities</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Vendor</th>
+                                <th>Stock Level</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-activities">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
+                                    No products added yet. Start by adding your first product!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add Product Tab -->
+            <div id="add-product" class="tab-content hidden">
+                <div class="form-section">
+                    <h2 style="margin-bottom: 20px; color: #495057;">Add New Product</h2>
+                    <form id="product-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="product-name">Product Name *</label>
+                                <input type="text" id="product-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="vendor-name">Vendor Name *</label>
+                                <input type="text" id="vendor-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category">
+                                    <option value="">Select Category</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Clothing">Clothing</option>
+                                    <option value="Food">Food & Beverages</option>
+                                    <option value="Books">Books</option>
+                                    <option value="Home">Home & Garden</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="sku">SKU/Product Code</label>
+                                <input type="text" id="sku">
+                            </div>
+                            <div class="form-group">
+                                <label for="current-stock">Current Stock *</label>
+                                <input type="number" id="current-stock" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="min-stock">Minimum Stock Level</label>
+                                <input type="number" id="min-stock" min="0" value="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="unit-price">Unit Price (₹)</label>
+                                <input type="number" id="unit-price" min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="supplier-contact">Supplier Contact</label>
+                                <input type="text" id="supplier-contact">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div id="inventory" class="tab-content hidden">
+                <div class="search-filter">
+                    <input type="text" id="search-inventory" placeholder="Search products...">
+                    <select id="filter-category">
+                        <option value="">All Categories</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Food">Food & Beverages</option>
+                        <option value="Books">Books</option>
+                        <option value="Home">Home & Garden</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="filter-stock-status">
+                        <option value="">All Stock Levels</option>
+                        <option value="low">Low Stock</option>
+                        <option value="medium">Medium Stock</option>
+                        <option value="high">High Stock</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>SKU</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Min Stock</th>
+                                <th>Unit Price</th>
+                                <th>Total Value</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-list">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px; color: #6c757d;">
+                                    No products in inventory. Add some products to get started!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vendors Tab -->
+            <div id="vendors" class="tab-content hidden">
+                <div id="vendor-groups">
+                    <p style="text-align: center; padding: 40px; color: #6c757d;">
+                        No vendors registered yet. Add products to see vendor groupings!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let products = [];
+        let vendors = new Set();
+
+        // Load data from localStorage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateDashboard();
+            updateInventoryDisplay();
+            updateVendorGroups();
+        });
+
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.remove('hidden');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Product form submission
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const product = {
+                id: Date.now(),
+                name: document.getElementById('product-name').value,
+                vendor: document.getElementById('vendor-name').value,
+                category: document.getElementById('category').value,
+                sku: document.getElementById('sku').value,
+                currentStock: parseInt(document.getElementById('current-stock').value),
+                minStock: parseInt(document.getElementById('min-stock').value),
+                unitPrice: parseFloat(document.getElementById('unit-price').value) || 0,
+                supplierContact: document.getElementById('supplier-contact').value,
+                description: document.getElementById('description').value,
+                dateAdded: new Date().toISOString()
+            };
+
+            products.push(product);
+            vendors.add(product.vendor);
+            
+            saveData();
+            updateDashboard();
+            updateInventoryDisplay();
+            updateVendorGroups();
+            
+            // Reset form
+            this.reset();
+            
+            // Show success message
+            alert('Product added successfully!');
+        });
+
+        // Update dashboard statistics
+        function updateDashboard() {
+            const totalProducts = products.length;
+            const totalVendors = vendors.size;
+            const lowStockItems = products.filter(p => p.currentStock <= p.minStock).length;
+            const totalValue = products.reduce((sum, p) => sum + (p.currentStock * p.unitPrice), 0);
+
+            document.getElementById('total-products').textContent = totalProducts;
+            document.getElementById('total-vendors').textContent = totalVendors;
+            document.getElementById('low-stock').textContent = lowStockItems;
+            document.getElementById('total-value').textContent = `₹${totalValue.toFixed(2)}`;
+
+            // Update recent activities
+            const recentActivities = document.getElementById('recent-activities');
+            if (products.length === 0) {
+                recentActivities.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
+                            No products added yet. Start by adding your first product!
+                        </td>
+                    </tr>
+                `;
+            } else {
+                const recentProducts = products.slice(-5).reverse();
+                recentActivities.innerHTML = recentProducts.map(product => `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td>${product.vendor}</td>
+                        <td>${product.currentStock}</td>
+                        <td><span class="stock-status ${getStockStatus(product)}">${getStockStatus(product)}</span></td>
+                        <td>${new Date(product.dateAdded).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Update inventory display
+        function updateInventoryDisplay() {
+            const inventoryList = document.getElementById('inventory-list');
+            
+            if (products.length === 0) {
+                inventoryList.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #6c757d;">
+                            No products in inventory. Add some products to get started!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            inventoryList.innerHTML = products.map(product => `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.sku || 'N/A'}</td>
+                    <td>${product.category || 'N/A'}</td>
+                    <td>${product.currentStock}</td>
+                    <td>${product.minStock}</td>
+                    <td>₹${product.unitPrice.toFixed(2)}</td>
+                    <td>₹${(product.currentStock * product.unitPrice).toFixed(2)}</td>
+                    <td><span class="stock-status ${getStockStatus(product)}">${getStockStatus(product)}</span></td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update vendor groups
+        function updateVendorGroups() {
+            const vendorGroups = document.getElementById('vendor-groups');
+            
+            if (vendors.size === 0) {
+                vendorGroups.innerHTML = `
+                    <p style="text-align: center; padding: 40px; color: #6c757d;">
+                        No vendors registered yet. Add products to see vendor groupings!
+                    </p>
+                `;
+                return;
+            }
+
+            const groupedByVendor = {};
+            products.forEach(product => {
+                if (!groupedByVendor[product.vendor]) {
+                    groupedByVendor[product.vendor] = [];
+                }
+                groupedByVendor[product.vendor].push(product);
+            });
+
+            vendorGroups.innerHTML = Object.entries(groupedByVendor).map(([vendor, vendorProducts]) => `
+                <div class="vendor-group">
+                    <h3>${vendor}</h3>
+                    <p><strong>Total Products:</strong> ${vendorProducts.length}</p>
+                    <p><strong>Total Stock Value:</strong> ₹${vendorProducts.reduce((sum, p) => sum + (p.currentStock * p.unitPrice), 0).toFixed(2)}</p>
+                    <p><strong>Contact:</strong> ${vendorProducts[0].supplierContact || 'Not provided'}</p>
+                    <div class="table-container" style="margin-top: 15px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${vendorProducts.map(product => `
+                                    <tr>
+                                        <td>${product.name}</td>
+                                        <td>${product.currentStock}</td>
+                                        <td><span class="stock-status ${getStockStatus(product)}">${getStockStatus(product)}</span></td>
+                                        <td>₹${(product.currentStock * product.unitPrice).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get stock status
+        function getStockStatus(product) {
+            if (product.currentStock <= product.minStock) return 'stock-low';
+            if (product.currentStock <= product.minStock * 2) return 'stock-medium';
+            return 'stock-high';
+        }
+
+        // Delete product
+        function deleteProduct(productId) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                products = products.filter(p => p.id !== productId);
+                
+                // Update vendors set
+                vendors.clear();
+                products.forEach(p => vendors.add(p.vendor));
+                
+                saveData();
+                updateDashboard();
+                updateInventoryDisplay();
+                updateVendorGroups();
+            }
+        }
+
+        // Search and filter functionality
+        document.getElementById('search-inventory').addEventListener('input', filterInventory);
+        document.getElementById('filter-category').addEventListener('change', filterInventory);
+        document.getElementById('filter-stock-status').addEventListener('change', filterInventory);
+
+        function filterInventory() {
+            const searchTerm = document.getElementById('search-inventory').value.toLowerCase();
+            const categoryFilter = document.getElementById('filter-category').value;
+            const stockStatusFilter = document.getElementById('filter-stock-status').value;
+            
+            const filteredProducts = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) ||
+                                    product.vendor.toLowerCase().includes(searchTerm) ||
+                                    (product.sku && product.sku.toLowerCase().includes(searchTerm));
+                
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                
+                const matchesStockStatus = !stockStatusFilter || 
+                    (stockStatusFilter === 'low' && product.currentStock <= product.minStock) ||
+                    (stockStatusFilter === 'medium' && product.currentStock > product.minStock && product.currentStock <= product.minStock * 2) ||
+                    (stockStatusFilter === 'high' && product.currentStock > product.minStock * 2);
+                
+                return matchesSearch && matchesCategory && matchesStockStatus;
+            });
+
+            const inventoryList = document.getElementById('inventory-list');
+            if (filteredProducts.length === 0) {
+                inventoryList.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #6c757d;">
+                            No products match your search criteria.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            inventoryList.innerHTML = filteredProducts.map(product => `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.sku || 'N/A'}</td>
+                    <td>${product.category || 'N/A'}</td>
+                    <td>${product.currentStock}</td>
+                    <td>${product.minStock}</td>
+                    <td>₹${product.unitPrice.toFixed(2)}</td>
+                    <td>₹${(product.currentStock * product.unitPrice).toFixed(2)}</td>
+                    <td><span class="stock-status ${getStockStatus(product)}">${getStockStatus(product)}</span></td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Data persistence functions
+        function saveData() {
+            try {
+                const data = {
+                    products: products,
+                    vendors: Array.from(vendors)
+                };
+                localStorage.setItem('vendorStockData', JSON.stringify(data));
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        function loadData() {
+            try {
+                const savedData = localStorage.getItem('vendorStockData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    products = data.products || [];
+                    vendors = new Set(data.vendors || []);
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                products = [];
+                vendors = new Set();
+            }
+        }
+    </script>
+</body>
+</html>

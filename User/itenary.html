@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ollama Travel Planner</title>
+  <style>
+    :root {
+      --primary-color: #1e90ff;
+      --secondary-color: #f1c40f;
+      --background-color: #e6f0fa;
+      --card-background: #ffffff;
+      --text-color: #2d3436;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--background-color), #d1e0ff);
+      padding: 40px;
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--text-color);
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    form {
+      background: var(--card-background);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      max-width: 800px;
+      margin: 0 auto;
+      transition: transform 0.3s ease;
+    }
+
+    form:hover {
+      transform: translateY(-5px);
+    }
+
+    label {
+      display: block;
+      margin-top: 1.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 1rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      border: 1px solid #dfe6e9;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #f8fafc;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(30, 144, 255, 0.2);
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 0.75rem 2rem;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, var(--primary-color), #3498db);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      display: block;
+      width: 100%;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #0984e3, #2c82c9);
+      transform: scale(1.02);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    pre {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      margin-top: 2rem;
+      white-space: pre-wrap;
+      font-family: 'Fira Code', monospace;
+      border-left: 4px solid var(--primary-color);
+      box-shadow: var(--shadow);
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      form {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Custom AI Itinerary Planner (Powered by Ollama + Llama 3)</h1>
+
+  <form onsubmit="event.preventDefault(); generateItinerary();">
+    <label>Destination:
+      <input type="text" id="destination" placeholder="e.g. Tokyo, Japan" required>
+    </label>
+
+    <label>Trip Duration (days):
+      <input type="number" id="duration" min="1" value="3" required>
+    </label>
+
+    <label>Total Budget (INR):
+      <input type="number" id="budget" placeholder="e.g. 150000" required>
+    </label>
+
+    <label>Preferred Pace:
+      <select id="pace">
+        <option value="relaxed">Relaxed</option>
+        <option value="moderate" selected>Moderate</option>
+        <option value="packed">Packed</option>
+        <option value="leisurely">Leisurely</option>
+        <option value="intense">Intense</option>
+      </select>
+    </label>
+
+    <label>Type of Trip:
+      <select id="tripType">
+        <option value="romantic">Romantic</option>
+        <option value="family">Family</option>
+        <option value="leisure">Leisure</option>
+        <option value="adventure">Adventure</option>
+        <option value="cultural">Cultural</option>
+        <option value="solo">Solo</option>
+        <option value="group">Group</option>
+        <option value="luxury">Luxury</option>
+      </select>
+    </label>
+
+    <label>Eco-Friendly Preference:
+      <select id="eco">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        <option value="partially">Partially</option>
+      </select>
+    </label>
+
+    <label>Traveler Names and Preferences:
+      <textarea id="travelersText" rows="6" placeholder="Describe each traveler freely, one per line.
+Example:
+Alice: vegetarian, loves museums and history
+Bob: adventure seeker, enjoys seafood" required></textarea>
+    </label>
+
+    <button type="submit">Generate Itinerary</button>
+  </form>
+
+  <pre id="output"></pre>
+
+  <script>
+    function parseTravelerLines(lines) {
+      return lines.trim().split('\n').map((line, i) => {
+        return `- Traveler ${i + 1}: ${line.trim()}`;
+      }).join('\n');
+    }
+
+    async function generateItinerary() {
+      const destination = document.getElementById('destination').value;
+      const duration = document.getElementById('duration').value;
+      const budget = document.getElementById('budget').value;
+      const pace = document.getElementById('pace').value;
+      const tripType = document.getElementById('tripType').value;
+      const ecoFriendly = document.getElementById('eco').value;
+      const travelersText = document.getElementById('travelersText').value;
+      const output = document.getElementById('output');
+
+      const travelerPrompt = parseTravelerLines(travelersText);
+
+      const systemPrompt = `You are a professional travel planner AI.
+Your job is to create detailed, personalized, and practical travel itineraries.
+The itinerary must include:
+- Day-wise plan with time blocks
+- Activities, food spots, local experiences
+- Eco-friendly options if requested (low-emission transport, sustainable food places, etc.)
+
+You must consider these parameters:
+1. Destination
+2. Duration
+3. Budget (as a number in INR)
+4. Travel pace (relaxed, moderate, packed, leisurely, intense)
+5. Type of trip (family, romantic, adventure, cultural, solo, group, luxury)
+6. Eco-friendly preference (yes/no/partially)
+7. Individual traveler interests and food preferences
+
+Provide well-structured and clearly timed itineraries with personalization for each traveler where applicable.`;
+
+      const userPrompt = `Destination: ${destination}
+Duration: ${duration} days
+Budget: ₹${budget}
+Pace: ${pace}
+Trip Type: ${tripType}
+Eco-Friendly: ${ecoFriendly}
+Travelers:
+${travelerPrompt}`;
+
+      output.textContent = '⏳ Generating itinerary...';
+
+      try {
+        const response = await fetch('http://localhost:11434/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'llama3',
+            prompt: `${systemPrompt}\n\n${userPrompt}`,
+            stream: true
+          })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let result = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n').filter(Boolean);
+
+          for (const line of lines) {
+            try {
+              const parsed = JSON.parse(line);
+              if (parsed.response) {
+                result += parsed.response;
+                output.textContent = result;
+              }
+            } catch (e) {
+              console.warn('Malformed JSON chunk:', line);
+            }
+          }
+        }
+
+      } catch (err) {
+        output.textContent = `⚠️ Error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

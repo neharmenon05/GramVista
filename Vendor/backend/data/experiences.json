@@ -1,0 +1,18 @@
+[
+  {
+    "vendor": "rajesh",
+    "name": "Clay Workshop",
+    "desc": "Learn to make clay pots with locals",
+    "price": 300,
+    "duration": 2,
+    "max": 10
+  },
+  {
+    "vendor": "malavika s",
+    "name": "Pottery Making",
+    "desc": "potteryyy",
+    "price": 100,
+    "duration": 2,
+    "max": 20
+  }
+]

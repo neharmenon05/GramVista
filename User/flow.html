@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Workflow Diagram</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .workflow-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 95vw;
+            max-width: 1800px;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .flow-diagram {
+            position: relative;
+            height: calc(100% - 120px);
+            width: 100%;
+        }
+        
+        /* Main Node */
+        .main-node {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+            z-index: 10;
+        }
+        
+        /* Navigation Row */
+        .nav-row {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            width: 90%;
+            justify-content: center;
+        }
+        
+        .nav-item {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex: 1;
+            max-width: 120px;
+        }
+        
+        .nav-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* Branch Containers */
+        .branch-container {
+            position: absolute;
+            top: 160px;
+            width: 45%;
+            height: calc(100% - 180px);
+        }
+        
+        .user-branch {
+            left: 2%;
+        }
+        
+        .vendor-branch {
+            right: 2%;
+        }
+        
+        .branch-header {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .user-header {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+        
+        .vendor-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
+        }
+        
+        /* Feature Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            height: calc(100% - 80px);
+        }
+        
+        .feature-item {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .user-feature {
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+        
+        .user-feature:hover {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+        
+        .vendor-feature {
+            border-color: #f39c12;
+            color: #f39c12;
+        }
+        
+        .vendor-feature:hover {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
+        }
+        
+        /* EcoSuite Special Section */
+        .ecosuite-section {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.3);
+        }
+        
+        .ecosuite-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .ecosuite-features {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+        
+        .ecosuite-item {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            flex: 1;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Connection Lines */
+        .connection-line {
+            position: absolute;
+            background: #34495e;
+            z-index: 1;
+        }
+        
+        .main-to-nav {
+            top: 60px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            transform: translateX(-50%);
+        }
+        
+        .nav-to-user {
+            top: 140px;
+            left: 25%;
+            width: 2px;
+            height: 20px;
+        }
+        
+        .nav-to-vendor {
+            top: 140px;
+            right: 25%;
+            width: 2px;
+            height: 20px;
+        }
+        
+        .nav-to-ecosuite {
+            bottom: 90px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            transform: translateX(-50%);
+        }
+        
+        /* Arrows */
+        .arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid #34495e;
+            z-index: 2;
+        }
+        
+        .arrow-main { top: 78px; left: 50%; transform: translateX(-50%); }
+        .arrow-user { top: 158px; left: 25%; transform: translateX(-50%); }
+        .arrow-vendor { top: 158px; right: 25%; transform: translateX(50%); }
+        .arrow-ecosuite { bottom: 78px; left: 50%; transform: translateX(-50%); }
+        
+        @media (max-width: 1400px) {
+            .feature-item { font-size: 0.75em; padding: 10px; }
+            .nav-item { font-size: 0.8em; padding: 12px 16px; }
+            .title { font-size: 1.8em; }
+        }
+        
+        @media (max-width: 1000px) {
+            .features-grid { grid-template-columns: 1fr; gap: 8px; }
+            .nav-row { flex-wrap: wrap; gap: 10px; }
+            .nav-item { max-width: 100px; font-size: 0.7em; }
+            .branch-container { width: 48%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="workflow-container">
+        <h1 class="title">Project Workflow Architecture</h1>
+        
+        <div class="flow-diagram">
+            <!-- Main Node -->
+            <div class="main-node">MAIN PAGE</div>
+            
+            <!-- Navigation Row -->
+            <div class="nav-row">
+                <div class="nav-item">ABOUT</div>
+                <div class="nav-item">EXPLORE</div>
+                <div class="nav-item">DESI CONNECT</div>
+                <div class="nav-item">CHATBOT</div>
+                <div class="nav-item">LOGIN/SIGNUP</div>
+            </div>
+            
+            <!-- User Branch -->
+            <div class="branch-container user-branch">
+                <div class="branch-header user-header">USER FEATURES</div>
+                <div class="features-grid">
+                    <div class="feature-item user-feature">Chatbot</div>
+                    <div class="feature-item user-feature">Digital Twin</div>
+                    <div class="feature-item user-feature">Custom Itinerary</div>
+                    <div class="feature-item user-feature">Service Booking</div>
+                    <div class="feature-item user-feature">Village Stay</div>
+                    <div class="feature-item user-feature">Language Learners</div>
+                    <div class="feature-item user-feature">Storytelling</div>
+                    <div class="feature-item user-feature">Marketplace</div>
+                    <div class="feature-item user-feature">SheSecure</div>
+                    <div class="feature-item user-feature">Dr Saab</div>
+                    <div class="feature-item user-feature">Banking & Distribution</div>
+                    <div class="feature-item user-feature">Location Filtering</div>
+                </div>
+            </div>
+            
+            <!-- Vendor Branch -->
+            <div class="branch-container vendor-branch">
+                <div class="branch-header vendor-header">VENDOR FEATURES</div>
+                <div class="features-grid">
+                    <div class="feature-item vendor-feature">Income Simulator</div>
+                    <div class="feature-item vendor-feature">Vendor Products Marketplace</div>
+                    <div class="feature-item vendor-feature">Finance Advisor</div>
+                    <div class="feature-item vendor-feature">Inventory Management</div>
+                    <div class="feature-item vendor-feature">Poll & Review</div>
+                    <div class="feature-item vendor-feature">Product Analytics</div>
+                </div>
+            </div>
+            
+            <!-- EcoSuite Section -->
+            <div class="ecosuite-section">
+                <div class="ecosuite-title">ECOSUITE FEATURES</div>
+                <div class="ecosuite-features">
+                    <div class="ecosuite-item">Carpooling</div>
+                    <div class="ecosuite-item">Carbon Calculator</div>
+                    <div class="ecosuite-item">Sustainability Grader</div>
+                    <div class="ecosuite-item">Product Analyzer</div>
+                </div>
+            </div>
+            
+            <!-- Connection Lines -->
+            <div class="connection-line main-to-nav"></div>
+            <div class="connection-line nav-to-user"></div>
+            <div class="connection-line nav-to-vendor"></div>
+            <div class="connection-line nav-to-ecosuite"></div>
+            
+            <!-- Arrows -->
+            <div class="arrow arrow-main"></div>
+            <div class="arrow arrow-user"></div>
+            <div class="arrow arrow-vendor"></div>
+            <div class="arrow arrow-ecosuite"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Add interactive animations
+        document.querySelectorAll('.feature-item, .nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.animation = 'pulse 0.6s ease-in-out';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 600);
+            });
+        });
+        
+        // Add pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Add hover effects for main node
+        const mainNode = document.querySelector('.main-node');
+        mainNode.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(-50%) scale(1.05)';
+        });
+        mainNode.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(-50%) scale(1)';
+        });
+    </script>
+</body>
+</html>

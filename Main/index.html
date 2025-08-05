@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../photos/logo.png">
+    <title>GramVistas - Discover the Soul of India</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background:url('https://png.pngtree.com/background/20230412/original/pngtree-nature-forest-sun-ecology-picture-image_2394782.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+
+            color: #f7f6f3;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(to bottom, #001802 , #0b520f);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(5, 54, 1, 1);
+        }
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        nav a {
+            color: #e6e3d3;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #d4a373;
+        }
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #d4a373;
+        }
+        .hero {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+        .slider {
+            display: flex;
+            width: 400%;
+            height: 100%;
+            animation: slide 20s infinite;
+        }
+        .slide {
+            width: 25%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .slide:nth-child(1) {
+            background-image: url('https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=2076&auto=format&fit=crop');
+        }
+        .slide:nth-child(2) {
+            background-image: url('https://images.unsplash.com/photo-1524229648276-e66561fe45a9?q=80&w=1143&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop');
+        }
+        .slide:nth-child(3) {
+            background-image: url('https://images.unsplash.com/photo-1629735919597-fed920b5bd84?q=80&w=1155&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop');
+        }
+        .slide:nth-child(4) {
+            background-image: url('https://assets.gqindia.com/photos/64d1d3673d23c9d61fbe3fca/16:9/w_2560%2Cc_limit/005%2520(1).jpg&auto=format&fit=crop');
+        }
+        .slide-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(30, 47, 42, 0.929);
+            padding: 30px;
+            border-radius: 10px;
+            color: #b97e43;
+            cursor: pointer;
+        }
+        .slide-overlay h2 {
+            font-size: 3em;
+            margin: 0;
+            animation: fadeIn 2s ease-in-out;
+        }
+        @keyframes slide {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-25%); }
+            50% { transform: translateX(-50%); }
+            75% { transform: translateX(-75%); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .filter-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            text-align: center;
+            background: #2e4a3f;
+            border-radius: 10px;
+            padding: 30px;
+        }
+        .filter-section h2 {
+            color: #d8d8d8;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-container select, .filter-container button {
+            padding: 12px;
+            font-size: 1em;
+            background: #3a5a4f;
+            color: #d1d0cc;
+            border: 1px solid #d4a373;
+            border-radius: 5px;
+            cursor: pointer;
+            min-width: 200px;
+            transition: background 0.3s;
+        }
+        .filter-container button {
+            background: #d6b53f;
+            color: #d1e25f;
+        }
+        .filter-container button:hover {
+            background: #e6e3d3;
+        }
+        .locations-section, .activities-section, .culture-section, .highlights-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .section-title {
+            color: #d3cfcb;
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card {
+            background: #ead948;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            animation: slideIn 1s ease-in-out forwards;
+            opacity: 0;
+        }
+        .card:nth-child(1) { animation-delay: 0.2s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+        .card:nth-child(3) { animation-delay: 0.6s; }
+        .card:nth-child(4) { animation-delay: 0.8s; }
+        .card:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .card:hover img {
+            transform: scale(1.1);
+        }
+        .card-content {
+            padding: 20px;
+            background: linear-gradient(to bottom, #3a5a4f, #2e4a3f);
+        }
+        .card-content h3 {
+            margin: 0;
+            color: #d4a373;
+            font-size: 1.5em;
+        }
+        .card-content p {
+            margin: 10px 0;
+        }
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateX(-50px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .booking-panel {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #3a5a4f;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .booking-panel h2 {
+            color: #c78d54;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .booking-form {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .booking-form select, .booking-form input, .booking-form button {
+            padding: 12px;
+            font-size: 1em;
+            background: #1a523f;
+            color: #fafafa;
+            border: 1px solid #090908;
+            border-radius: 5px;
+            min-width: 200px;
+            transition: background 0.3s;
+        }
+        .booking-form button {
+            background: #d4a373;
+            color: #1a2f2a;
+        }
+        .booking-form button:hover {
+            background: #e6e3d3;
+        }
+        .highlights-section .card {
+            background: #4a6a5f;
+        }
+        footer {
+            background: linear-gradient(to top, #1a2f2a, #2e4a3f);
+            padding: 40px 20px;
+            color: #e6e3d3;
+            text-align: center;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+        .footer-section h3 {
+            color: #d4a373;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .footer-section a {
+            color: #e6e3d3;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+            transition: color 0.3s;
+        }
+        .footer-section a:hover {
+            color: #d4a373;
+        }
+        .footer-bottom {
+            margin-top: 20px;
+            border-top: 1px solid #2e4a3f;
+            padding-top: 20px;
+        }
+        .loading-message {
+            text-align: center;
+            color: #d4a373;
+            font-size: 1.2em;
+            padding: 20px;
+        }
+        .no-results {
+            text-align: center;
+            color: #d4a373;
+            font-size: 1.2em;
+            padding: 40px;
+            background: #2e4a3f;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        .btn {
+        background-color: #1e5631;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+        background-color: #163c22;
+        }
+
+</style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+            <img src="../photos/logo.png" alt="GramVistas Logo" style="height: 80px; vertical-align: middle; margin-right: 8px;">
+            GramVistas
+            </div>
+            <div>
+                <a href="about.html">About</a>
+                <a href="ecosuite.html">Ecosuite</a>
+                <a href="http://localhost:3000/">DesiConnect</a>
+                <a href="login.html">Login/Signup</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div id="chatbot-panel" style="
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        width: 400px;
+        height: 500px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        display: none;
+        background: white;
+        z-index: 9999;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        ">
+        <iframe 
+        src="advancedchatBot.html" 
+        width="100%" 
+        height="100%" 
+        style="border: none; border-radius: 10px;">
+        </iframe>
+        </div>
+        <button onclick="toggleChatbot()" style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #132710;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        ">
+        💬
+        </button>
+
+        <div class="slider">
+            <div class="slide">
+                <div class="slide-overlay">
+                    <h2>Explore India</h2>
+                    <p>Uncover the vibrant soul of India with GramVistas</p>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-overlay">
+                    <h2>Nature</h2>
+                    <p>Breathe in the Beauty of India's Landscapes!</p>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-overlay">
+                    <h2>Wildlife</h2>
+                    <p>Into the Wild Where Majesty Roams!</p>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-overlay">
+                    <h2>Heritage</h2>
+                    <p>Walk Through the Stories of Centuries!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="filter-section">
+        <h2>Plan Your Indian Journey</h2>
+        <div class="filter-container">
+            <select id="state-filter">
+                <option value="">Select a State...</option>
+                <option value="andhra_pradesh">Andhra Pradesh</option>
+                <option value="arunachal_pradesh">Arunachal Pradesh</option>
+                <option value="assam">Assam</option>
+                <option value="bihar">Bihar</option>
+                <option value="chhattisgarh">Chhattisgarh</option>
+                <option value="goa">Goa</option>
+                <option value="gujarat">Gujarat</option>
+                <option value="haryana">Haryana</option>
+                <option value="himachal_pradesh">Himachal Pradesh</option>
+                <option value="jharkhand">Jharkhand</option>
+                <option value="karnataka">Karnataka</option>
+                <option value="kerala">Kerala</option>
+                <option value="madhya_pradesh">Madhya Pradesh</option>
+                <option value="maharashtra">Maharashtra</option>
+                <option value="manipur">Manipur</option>
+                <option value="meghalaya">Meghalaya</option>
+                <option value="mizoram">Mizoram</option>
+                <option value="nagaland">Nagaland</option>
+                <option value="odisha">Odisha</option>
+                <option value="punjab">Punjab</option>
+                <option value="rajasthan">Rajasthan</option>
+                <option value="sikkim">Sikkim</option>
+                <option value="tamil_nadu">Tamil Nadu</option>
+                <option value="telangana">Telangana</option>
+                <option value="tripura">Tripura</option>
+                <option value="uttar_pradesh">Uttar Pradesh</option>
+                <option value="uttarakhand">Uttarakhand</option>
+                <option value="west_bengal">West Bengal</option>
+                <option value="andaman_nicobar">Andaman and Nicobar Islands</option>
+                <option value="chandigarh">Chandigarh</option>
+                <option value="dadra_nagar_haveli_daman_diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                <option value="delhi">Delhi</option>
+                <option value="jammu_kashmir">Jammu and Kashmir</option>
+                <option value="ladakh">Ladakh</option>
+                <option value="lakshadweep">Lakshadweep</option>
+                <option value="puducherry">Puducherry</option>
+            </select>
+            <select id="interest-filter">
+                <option value="">Select an Interest...</option>
+                <option value="culture">Cultural Heritage</option>
+                <option value="adventure">Adventure & Trekking</option>
+                <option value="spiritual">Spiritual Journey</option>
+                <option value="beach">Beach & Relaxation</option>
+                <option value="wildlife">Wildlife Safari</option>
+                <option value="luxury">Luxury Experience</option>
+            </select>
+            <button onclick="filterDestinations()">Discover Now</button>
+        </div>
+    </section>
+
+    <section class="locations-section">
+        <h2 class="section-title">Iconic Destinations</h2>
+        <div class="card-grid" id="destination-cards">
+            <div class="loading-message">Loading destinations...</div>
+        </div>
+    </section>
+
+    <section class="booking-panel">
+        <h2>Book Your Travel</h2>
+        <p>Plan your perfect trip with our easy booking options</p>
+            <button onclick="location.href='booking.html'" class="btn">Plan Now</button>
+        </div>
+    </section>
+
+    <section class="activities-section">
+        <h2 class="section-title">Adventure & Activities</h2>
+        <div class="card-grid">
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/532189860/photo/himalayan-trekking.jpg?s=612x612&w=0&k=20&c=A88dF0H90DFcXwa-aO41dLCCSb-P19X2Sh73yR3PiPc=&auto=format&fit=crop" alt="Trekking">
+                <div class="card-content">
+                    <h3>Himalayan Trekking</h3>
+                    <p>Embark on thrilling treks through rugged trails and scenic valleys in Himachal and Uttarakhand.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/2019888612/photo/wild-female-bengal-tiger-walking-or-crossing-forest-track-in-front-of-safari-vehicles.jpg?s=612x612&w=0&k=20&c=XfknE6bAtCJ5yIcCQALDbTd8b8qVIVPMMBMqb9n83h4=&auto=format&fit=crop" alt="Wildlife Safari">
+                <div class="card-content">
+                    <h3>Wildlife Safari</h3>
+                    <p>Spot tigers, elephants, and more in India's renowned national parks like Ranthambore and Jim Corbett.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/1404349213/photo/old-fishing-boats-on-beach-in-india.jpg?s=612x612&w=0&k=20&c=HzuSmvV3zNKQWHxpSwPqiJM3md3wSxcfnblA0ek48kU=&auto=format&fit=crop" alt="Beach Relaxation">
+                <div class="card-content">
+                    <h3>Goa Beaches</h3>
+                    <p>Unwind on golden sands, enjoy water sports, and soak in Goa's vibrant coastal vibe.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="culture-section">
+        <h2 class="section-title">Cultural Heritage</h2>
+        <div class="card-grid">
+            <div class="card">
+                <img src="https://i0.wp.com/www.tusktravel.com/blog/wp-content/uploads/2022/04/Ganga-Aarti-Varanasi-1.jpg?fit=1024%2C683&ssl=1&auto=format&fit=crop" alt="Varanasi">
+                <div class="card-content">
+                    <h3>Sacred Varanasi</h3>
+                    <p>Witness ancient rituals and spiritual serenity along the sacred Ganges River.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/1063328926/photo/gopurams-in-sri-ranganathaswamy-temple-india.jpg?s=612x612&w=0&k=20&c=jFAJj5Bd-rTyjqorUENXNTaBHKzckOa4VT5gYPZxC0I=&auto=format&fit=crop" alt="Temple Trail">
+                <div class="card-content">
+                    <h3>Tamil Nadu Temples</h3>
+                    <p>Explore intricate Dravidian architecture and vibrant festivals in Tamil Nadu's temple towns.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/467314945/photo/musicians-with-decorated-bull-during-pongal-festival.jpg?s=612x612&w=0&k=20&c=rqXSQy7KXKoRXmxWoKvYH5ZBACCiQ_aMwR-imhyF1G4=&auto=format&fit=crop" alt="Festivals">
+                <div class="card-content">
+                    <h3>Indian Festivals</h3>
+                    <p>Immerse in the colors and joy of Diwali, Holi, and other vibrant celebrations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="highlights-section">
+        <h2 class="section-title">Occasions & Events</h2>
+        <div class="card-grid">
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/494568744/photo/diwali.jpg?s=612x612&w=0&k=20&c=XuWugY3FmIqacFNPlXpkJqMNyoAnHG_11l415qQBE-Y=&fit=crop" alt="Diwali">
+                <div class="card-content">
+                    <h3>Diwali Festival</h3>
+                    <p>Join the Festival of Lights with dazzling fireworks and traditional sweets across India.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/1381030718/photo/barsana-holi-one-of-the-most-joyful-festival-of-india-this-is-birth-place-of-radha-lord.jpg?s=612x612&w=0&k=20&c=c0kcjHpSFJXg7F4D6s8Ez-7RWY3MjoIrwsiRQKScank=&fit=crop" alt="Holi">
+                <div class="card-content">
+                    <h3>Holi Celebration</h3>
+                    <p>Experience the vibrant colors and joyous spirit of Holi, the festival of spring.</p>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://media.istockphoto.com/id/458237899/photo/kumbh-mela-in-haridwar.jpg?s=612x612&w=0&k=20&c=PkjlCGNP0BgGslwoi1jF5IhdX7TsVPQ7taiKOvhmEgU=&fit=crop" alt="Kumbh Mela">
+                <div class="card-content">
+                    <h3>Kumbh Mela</h3>
+                    <p>Participate in the world's largest spiritual gathering along sacred rivers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About GramVistas</h3>
+                <p>GramVistas is your gateway to exploring India's rich culture, diverse landscapes, and vibrant traditions.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="about.html">About Us</a>
+                <a href="index.html">Explore Destinations</a>
+                <a href="ecosuite.html">Ecosuite</a>
+                <a href="desiconnect.html">DesiConnect Community</a>
+                <a href="booking.html"></a>
+                <a href="login.html">Login/Signup</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <a href="mailto:support@gramvistas.com">support@gramvistas.com</a>
+                <a href="tel:+91-123-456-7890">+91-123-456-7890</a>
+                <a href="contact.html">Contact Form</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 GramVistas. All rights reserved. Discover India's soul with us.</p>
+        </div>
+    </footer>
+
+    <script>
+        let allLocations = [];
+
+        async function loadLocations() {
+            try {
+                const response = await fetch('backend/locations.json'); 
+                if (!response.ok) {
+                    throw new Error('Failed to fetch JSON');
+                }
+                const data = await response.json();
+                allLocations = data;
+                renderLocations(allLocations);
+            } catch (error) {
+                console.error('Error loading locations:', error);
+                document.getElementById('destination-cards').innerHTML = 
+                    '<div class="no-results">Error loading destinations. Please try again later.</div>';
+            }
+        }
+
+        function renderLocations(locations) {
+            const container = document.getElementById('destination-cards');
+            
+            if (locations.length === 0) {
+                container.innerHTML = '<div class="no-results">No destinations found matching your criteria. Please try different filters.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            locations.forEach((loc, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.2}s`;
+                card.innerHTML = `
+                    <img src="${loc.image}" alt="${loc.name}" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Available'">
+                    <div class="card-content">
+                        <h3>${loc.name}</h3>
+                        <p>${loc.description}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterDestinations() {
+            const state = document.getElementById('state-filter').value;
+            const interest = document.getElementById('interest-filter').value;
+
+            if (!allLocations.length) {
+                alert('Destinations are still loading. Please wait a moment and try again.');
+                return;
+            }
+
+            const filtered = allLocations.filter(loc => {
+                const stateMatch = !state || loc.state === state;
+                const interestMatch = !interest || loc.interest === interest;
+                return stateMatch && interestMatch;
+            });
+
+            renderLocations(filtered);
+
+            // Show filter results message
+            const filterMessage = [];
+            if (state) {
+                const stateOption = document.querySelector(`#state-filter option[value="${state}"]`);
+                filterMessage.push(`State: ${stateOption.textContent}`);
+            }
+            if (interest) {
+                const interestOption = document.querySelector(`#interest-filter option[value="${interest}"]`);
+                filterMessage.push(`Interest: ${interestOption.textContent}`);
+            }
+
+            if (filterMessage.length > 0) {
+                console.log(`Filtered results for ${filterMessage.join(', ')}: ${filtered.length} destinations found`);
+            }
+        }
+          
+
+        function toggleChatbot() {
+            const panel = document.getElementById('chatbot-panel');
+            const isVisible = panel.style.display === 'block';
+            panel.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Reset filters function
+        function resetFilters() {
+            document.getElementById('state-filter').value = '';
+            document.getElementById('interest-filter').value = '';
+            renderLocations(allLocations);
+        }
+
+        // Search functionality
+        function searchDestinations(query) {
+            if (!query.trim()) {
+                renderLocations(allLocations);
+                return;
+            }
+
+            const filtered = allLocations.filter(loc => 
+                loc.name.toLowerCase().includes(query.toLowerCase()) ||
+                loc.description.toLowerCase().includes(query.toLowerCase())
+            );
+
+            renderLocations(filtered);
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            loadLocations();
+            
+            // Add event listeners for real-time filtering
+            document.getElementById('state-filter').addEventListener('change', filterDestinations);
+            document.getElementById('interest-filter').addEventListener('change', filterDestinations);
+        };
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K to focus on search (if you add a search box later)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                // Focus search box when implemented
+            }
+            
+            // Escape to close chatbot
+            if (e.key === 'Escape') {
+                document.getElementById('chatbot-panel').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

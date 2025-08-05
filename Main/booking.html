@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Ticket Booking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://wallpaperaccess.com/full/2196488.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 sm:p-6 bg-gray-900 bg-opacity-50">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
+            🚆 Transport Ticket Booking
+        </h1>
+
+        <form id="travelForm" class="space-y-6">
+            <div class="space-y-2">
+                <label for="from" class="block text-sm font-semibold text-gray-700">From</label>
+                <input type="text" id="from" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                       placeholder="Enter starting location">
+            </div>
+            <div class="space-y-2">
+                <label for="to" class="block text-sm font-semibold text-gray-700">To</label>
+                <input type="text" id="to" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                       placeholder="Enter destination">
+            </div>
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300">
+                Get Suggestions
+            </button>
+        </form>
+
+        <div class="suggestion mt-8 hidden" id="suggestion">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Suggested Transport Options</h2>
+            <div id="suggestedLinks" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('travelForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const suggestionDiv = document.getElementById('suggestion');
+            const suggestedLinks = document.getElementById('suggestedLinks');
+
+            // Clear previous suggestions
+            suggestedLinks.innerHTML = '';
+
+            if (from && to) {
+                const links = [
+                    { href: "https://www.irctc.co.in/", text: `Indian Railways - IRCTC Ticket Booking from ${from} to ${to}` },
+                    { href: "https://www.redbus.in/", text: `RedBus - Bus Ticket Booking from ${from} to ${to}` },
+                    { href: "https://www.airindia.in/", text: `Air India - Flight Booking from ${from} to ${to}` },
+                    { href: "https://www.ola.com/", text: `Ola - Cab Booking from ${from} to ${to}` },
+                    { href: "https://www.uber.com/", text: `Uber - Cab Booking from ${from} to ${to}` }
+                ];
+
+                links.forEach(link => {
+                    suggestedLinks.innerHTML += `
+                        <div class="card bg-gray-50 p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 fade-in">
+                            <a href="${link.href}" target="_blank" class="text-blue-600 font-semibold hover:text-blue-800">
+                                ${link.text}
+                            </a>
+                        </div>
+                    `;
+                });
+            }
+
+            suggestionDiv.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
