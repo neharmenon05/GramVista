@@ -81,7 +81,7 @@ REQUIREMENTS:
 - MongoDB
 
 QUICK START:
-git clone https://github.com/your-username/gramvista.git
+git clone https://github.com/neharmenon05/gramvista.git
 cd gramvista
 npm install
 
