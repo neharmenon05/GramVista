@@ -98,13 +98,13 @@ RUN COMMANDS (BASH SCRIPT)
 ```node server.js```
 
 **Run Digital Twin**
-```cd main/user/digital-twin/```
+```cd User/Digital_twin/```
 ```source venv/bin/activate   # Linux/Mac```
-```venv\Scripts\activate      # Windows```
+``` .venv\Scripts\activate    # Windows```
 ```python app.py```
 
 **Run SheSecure**
-```cd user/SheSecure/```
+```cd User/SheSecure/```
 ```npm run dev```
 
 **Run main application**
